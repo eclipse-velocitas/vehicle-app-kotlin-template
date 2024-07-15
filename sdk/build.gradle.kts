@@ -59,12 +59,12 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
-    implementation("io.grpc:grpc-okhttp:1.64.0")
-    implementation("io.grpc:grpc-protobuf-lite:1.64.0")
-    implementation("io.grpc:grpc-stub:1.64.0")
-    compileOnly("org.apache.tomcat:annotations-api:6.0.53")
+    implementation(libs.grpc.okhttp)
+    implementation(libs.grpc.protobuf.lite)
+    implementation(libs.grpc.stub)
+    compileOnly(libs.annotations.api)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.kotest.runner.junit5)
 }
