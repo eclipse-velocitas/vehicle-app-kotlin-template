@@ -16,13 +16,7 @@
 
 package velocitas.sdk.grpc
 
-import io.grpc.Channel
-import io.grpc.Grpc
-import io.grpc.Status
 import io.grpc.stub.StreamObserver
-import org.eclipse.kuksa.proto.v1.BrokerGrpc
-import org.eclipse.kuksa.proto.v1.BrokerOuterClass.SubscribeReply
-import org.eclipse.kuksa.proto.v1.BrokerOuterClass.SubscribeRequest
 import velocitas.sdk.Logger
 
 abstract class GrpcCall {

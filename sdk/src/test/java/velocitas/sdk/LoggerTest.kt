@@ -18,7 +18,6 @@ package velocitas.sdk
 
 import io.kotest.core.config.LogLevel
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.shouldBe
 
 class LoggerTest : BehaviorSpec({
     Logger.setLoggerImplementation(StringLogger)

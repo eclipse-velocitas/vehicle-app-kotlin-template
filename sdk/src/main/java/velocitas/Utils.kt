@@ -16,9 +16,6 @@
 
 package velocitas
 
-import java.net.URI
-import java.net.URL
-
 fun getEnvVar(varName: String, defaultValue: String = ""): String {
     val envVar = System.getenv(varName)
     if (envVar != null) {
