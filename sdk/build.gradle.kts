@@ -20,6 +20,7 @@ plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
     id ("com.google.protobuf") version "0.9.4"
+    ktlint
 }
 
 java {
