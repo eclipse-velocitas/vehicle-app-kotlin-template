@@ -107,7 +107,6 @@ class AsyncResult<TResultType> {
         return this
     }
 
-
     /**
      * Calls the specified callback when an error occurs during async execution.
      *        The callback invocation is done by a worker thread.
@@ -129,5 +128,4 @@ class AsyncResult<TResultType> {
     fun isInAwaitingState(): Boolean {
         return isAwaiting.get()
     }
-
 }

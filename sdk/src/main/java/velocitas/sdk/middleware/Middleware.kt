@@ -22,30 +22,24 @@ abstract class Middleware protected constructor(
     /**
      * The type identifier of the concrete middleware implementation
      */
-    val typeId: String
+    val typeId: String,
 ) {
     private val metadata: Metadata = Metadata()
 
     /**
      * Triggers the start of the middleware
      */
-    open fun start() {
-
-    }
+    open fun start() { }
 
     /**
      * Waits (blocks current thread) until the middleware is started and ready to use
      */
-    open fun waitUntilReady() {
-
-    }
+    open fun waitUntilReady() { }
 
     /**
      * Stops the middleware
      */
-    open fun stop() {
-
-    }
+    open fun stop() { }
 
     /**
      * Get the location description (e.g. uri) of the specified service name
@@ -73,7 +67,7 @@ abstract class Middleware protected constructor(
          * Defines the name of the environment variable used to determine the middleware type to
          * be used.
          */
-        const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE";
+        const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE"
 
         /**
          * Returns a reference to a singleton instance of a concrete middleware class
@@ -103,5 +97,3 @@ abstract class Middleware protected constructor(
         }
     }
 }
-
-

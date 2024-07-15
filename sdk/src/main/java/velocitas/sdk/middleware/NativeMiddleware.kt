@@ -32,13 +32,15 @@ class NativeMiddleware : Middleware(TYPE_ID) {
 
         val defaultServiceAddress = getDefaultLocation(serviceName)
         if (defaultServiceAddress?.isNotEmpty() == true) {
-            Logger.warn("Env variable '$envVarName' defining location of " +
-                    "service '$serviceName' not properly set. Taking default: '$serviceAddress'")
+            Logger.warn(
+                "Env variable '$envVarName' defining location of " +
+                    "service '$serviceName' not properly set. Taking default: '$serviceAddress'",
+            )
             return defaultServiceAddress
         }
 
         val errorMessage = "Env variable '$envVarName' defining location of " +
-                "service '$serviceName' not set. Please define!"
+            "service '$serviceName' not set. Please define!"
         Logger.error(errorMessage)
         throw RuntimeException(errorMessage)
     }
@@ -48,7 +50,7 @@ class NativeMiddleware : Middleware(TYPE_ID) {
 
         val DEFAULT_LOCATIONS = mapOf(
             "mqtt" to "localhost:1883",
-            "vehicledatabroker" to "localhost:55555"
+            "vehicledatabroker" to "localhost:55555",
         )
 
         fun getDefaultLocation(serviceName: String): String? {

@@ -102,7 +102,6 @@ class SimpleUrlParseTest : BehaviorSpec({
             then("The netLocation should be resolved to 'localhost:1234'") {
                 result.netLocation shouldBe netLocation
             }
-
         }
     }
 })

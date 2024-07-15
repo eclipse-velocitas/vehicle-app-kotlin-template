@@ -59,7 +59,7 @@ class GrpcStreamingResponseCall<TRequestType, TReplyType> : GrpcCall() {
     }
 
     class ReadReactor<TRequestType, TReplyType>(
-        private val parent: GrpcStreamingResponseCall<TRequestType, TReplyType>
+        private val parent: GrpcStreamingResponseCall<TRequestType, TReplyType>,
     ) : StreamObserver<TReplyType> {
         var reply: TReplyType? = null
         var onDataHandler: ((TReplyType) -> Unit)? = null

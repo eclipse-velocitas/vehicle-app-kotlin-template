@@ -27,7 +27,7 @@ class GrpcClientTest : BehaviorSpec({
             val call = GrpcSingleResponseCall<String, String>()
             grpcClient.addActiveCall(call)
 
-            then ("There should be one active call") {
+            then("There should be one active call") {
                 grpcClient.numActiveCalls shouldBe 1
             }
         }

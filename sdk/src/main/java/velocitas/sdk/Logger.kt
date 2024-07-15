@@ -100,7 +100,7 @@ object Logger {
     }
 }
 
-class ConsoleLogger: ILogger {
+class ConsoleLogger : ILogger {
     override fun debug(msg: String) {
         val formattedMsg = format("DEBUG", msg)
         println(formattedMsg)

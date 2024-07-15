@@ -21,9 +21,7 @@ import velocitas.sdk.middleware.Middleware
 /**
  * Base class for all vehicle apps which manages an app's lifecycle.
  */
-abstract class VehicleApp
-{
-
+abstract class VehicleApp {
     /**
      * Runs the Vehicle App.
      */

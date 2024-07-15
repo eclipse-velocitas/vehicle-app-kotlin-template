@@ -77,7 +77,6 @@ class JobTest : BehaviorSpec({
                 isExecuting shouldBe false
             }
         }
-
     }
 
     given("A short running RecurringJob") {
@@ -102,7 +101,6 @@ class JobTest : BehaviorSpec({
                 isExecuted shouldBe true
             }
         }
-
 
         `when`("Cancel is called") {
             val result = runCatching {

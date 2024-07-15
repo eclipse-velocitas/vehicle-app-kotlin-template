@@ -35,7 +35,7 @@ class GrpcClient {
         ThreadPool.getInstance().enqueue(recurringJob)
     }
 
-   @Synchronized
+    @Synchronized
     fun addActiveCall(call: GrpcCall) {
         activeCalls.add(call)
     }

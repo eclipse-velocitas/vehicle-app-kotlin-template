@@ -92,6 +92,5 @@ class NativeMiddlewareTest : BehaviorSpec({
                 metaData.isEmpty() shouldBe true
             }
         }
-
     }
 })

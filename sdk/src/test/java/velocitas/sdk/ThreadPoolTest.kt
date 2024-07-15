@@ -269,7 +269,6 @@ open class FakeJob : IJob {
             }
         }
     }
-
 }
 
 enum class State {
