@@ -54,3 +54,7 @@ tasks.register<JavaExec>("ktlintFormat") {
         "!**/build/**",
     )
 }
+
+tasks.named("check") {
+    finalizedBy(ktlintCheck)
+}

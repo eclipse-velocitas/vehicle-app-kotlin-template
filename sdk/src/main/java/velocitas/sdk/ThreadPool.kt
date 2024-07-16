@@ -49,18 +49,18 @@ class ThreadPool(var numWorkerThreads: Int) {
         isRunning.set(false)
     }
 
+    @Suppress("TooGenericExceptionCaught") // third party code could throw any exception
     private fun threadLoop() {
         while (isRunning.get()) {
-            val polledJob = jobs.poll()
-            if (polledJob != null) {
-                try {
-                    polledJob.execute()
-                    if (polledJob.shallRecur()) {
-                        enqueue(polledJob)
-                    }
-                } catch (e: Exception) {
-                    Logger.error("Uncaught Exception in job execution: ${e.message}")
+            val polledJob = jobs.poll() ?: continue
+
+            try {
+                polledJob.execute()
+                if (polledJob.shallRecur()) {
+                    enqueue(polledJob)
                 }
+            } catch (e: Exception) {
+                Logger.error("Uncaught Exception in job execution: ${e.message}")
             }
         }
     }

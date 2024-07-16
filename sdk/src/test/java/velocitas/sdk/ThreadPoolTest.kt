@@ -152,11 +152,11 @@ class ThreadPoolTest : BehaviorSpec({
         }
 
         and("A currently running job is finished") {
-            val fakeJob = fakeJobs.first
+            val fakeJob = fakeJobs.first()
             fakeJob.finish()
 
             then("It should be executed") {
-                val lastFakeJob = fakeJobs.last
+                val lastFakeJob = fakeJobs.last()
                 lastFakeJob.waitForExecution() shouldBe true
             }
         }
@@ -197,7 +197,7 @@ class ThreadPoolTest : BehaviorSpec({
         createAndExecuteJob()
 
         `when`("It throws an Exception") {
-            fakeJobs.last.throwException()
+            fakeJobs.last().throwException()
 
             then("The Worker should accept new jobs") {
                 occupyAllWorkers() shouldBe true
@@ -227,7 +227,7 @@ open class FakeJob : IJob {
             atomicExecutionState.set(State.Finished)
         }
         if (throwException) {
-            throw RuntimeException()
+            error("throwing test exception")
         }
     }
 

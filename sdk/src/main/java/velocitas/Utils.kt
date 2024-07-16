@@ -37,8 +37,8 @@ fun getEnvVar(varName: String, defaultValue: String = ""): String {
  * Other elements to be added as needed ...
  */
 class SimpleUrlParse(url: String) {
-    private val SCHEME_PART_START = "//"
-    private val SIMPLIFIED_SCHEME_SEPARATOR = "://"
+    private val schemePartStart = "//"
+    private val simplifiedSchemeSeparator = "://"
 
     /**
      * The parsed scheme which can be the empty string if the URL does not contain a scheme
@@ -61,16 +61,16 @@ class SimpleUrlParse(url: String) {
     }
 
     private fun parse(url: String) {
-        var schemeLen = url.indexOf(SIMPLIFIED_SCHEME_SEPARATOR)
+        var schemeLen = url.indexOf(simplifiedSchemeSeparator)
         if (schemeLen > -1) {
             this.scheme = url.substring(0, schemeLen).lowercase()
         } else {
             schemeLen = 0
         }
 
-        var startOfSchemePart = url.indexOf(SCHEME_PART_START, schemeLen)
+        var startOfSchemePart = url.indexOf(schemePartStart, schemeLen)
         if (startOfSchemePart > -1) {
-            startOfSchemePart += SCHEME_PART_START.length
+            startOfSchemePart += schemePartStart.length
         } else {
             startOfSchemePart = 0
         }

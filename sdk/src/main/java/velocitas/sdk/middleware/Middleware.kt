@@ -92,7 +92,7 @@ abstract class Middleware protected constructor(
             } else if (middlewareType == NativeMiddleware.TYPE_ID) {
                 NativeMiddleware()
             } else {
-                throw RuntimeException("Unknown middleware type '$middlewareType'")
+                error("Unknown middleware type '$middlewareType'")
             }
         }
     }

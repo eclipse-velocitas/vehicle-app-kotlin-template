@@ -47,6 +47,7 @@ open class Job(private val function: (() -> Unit)) : IJob {
 
     @Synchronized
     fun waitForTermination() {
+        // empty default implementation
     }
 }
 

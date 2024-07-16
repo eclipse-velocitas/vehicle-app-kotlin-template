@@ -25,6 +25,10 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+dependencies {
+    detektPlugins(libs.detekt.formatting)
+}
+
 detekt {
     buildUponDefaultConfig = true
     allRules = false // activate all available (even unstable) rules.
@@ -61,10 +65,6 @@ tasks.withType<Detekt>().configureEach {
 }
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = "1.8"
-}
-
-dependencies {
-    detektPlugins(libs.detekt.formatting)
 }
 
 subprojects {

@@ -65,6 +65,7 @@ class GrpcStreamingResponseCall<TRequestType, TReplyType> : GrpcCall() {
         var onDataHandler: ((TReplyType) -> Unit)? = null
         var onFinishHandler: (() -> Unit)? = null
 
+        @Suppress("TooGenericExceptionCaught") // third party code could throw any exception
         override fun onNext(value: TReplyType) {
             this.reply = value
             try {

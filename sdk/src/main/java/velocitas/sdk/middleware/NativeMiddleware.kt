@@ -42,7 +42,7 @@ class NativeMiddleware : Middleware(TYPE_ID) {
         val errorMessage = "Env variable '$envVarName' defining location of " +
             "service '$serviceName' not set. Please define!"
         Logger.error(errorMessage)
-        throw RuntimeException(errorMessage)
+        throw IllegalStateException(errorMessage)
     }
 
     companion object {

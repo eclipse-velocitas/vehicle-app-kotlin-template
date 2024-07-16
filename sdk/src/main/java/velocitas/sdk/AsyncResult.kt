@@ -77,8 +77,8 @@ class AsyncResult<TResultType> {
      * @return TResultType    Result of the async operation once it completes.
      */
     fun await(): TResultType {
-        if (resultCallback != null) {
-            throw RuntimeException("Invalid usage: Either call await() or register an onResult callback!")
+        check(resultCallback == null) {
+            "Invalid usage: Either call await() or register an onResult callback!"
         }
 
         isAwaiting.set(true)
@@ -99,8 +99,8 @@ class AsyncResult<TResultType> {
      * @return AsyncResult     This for method chaining.
      */
     fun onResult(onResultCallback: ((TResultType) -> Unit)): AsyncResult<TResultType> {
-        if (isAwaiting.get()) {
-            throw RuntimeException("Invalid usage: Either call await() or register an onResult callback!")
+        check(!isAwaiting.get()) {
+            "Invalid usage: Either call await() or register an onResult callback!"
         }
         resultCallback = onResultCallback
 
