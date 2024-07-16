@@ -18,9 +18,11 @@ package velocitas.sdk
 
 import io.kotest.core.config.LogLevel
 import io.kotest.core.spec.style.BehaviorSpec
+import velocitas.sdk.logging.Logger
+import velocitas.sdk.logging.VelocitasLogger
 
 class LoggerTest : BehaviorSpec({
-    Logger.setLoggerImplementation(StringLogger)
+    VelocitasLogger.setLoggerImplementation(StringLogger)
 
     given("An errorMessage w/o arguments") {
         val errorMessage = "Error: Some Error Occurred - Errorcode: "
@@ -28,7 +30,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Debug Level") {
             counter++
-            Logger.debug("$errorMessage ($counter)")
+            VelocitasLogger.debug("$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Debug
@@ -38,7 +40,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Info Level") {
             counter++
-            Logger.info("$errorMessage ($counter)")
+            VelocitasLogger.info("$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Info
@@ -48,7 +50,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Warn Level") {
             counter++
-            Logger.warn("$errorMessage ($counter)")
+            VelocitasLogger.warn("$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Warn
@@ -59,7 +61,7 @@ class LoggerTest : BehaviorSpec({
         `when`("Logging on Error Level") {
             counter++
 
-            Logger.error("$errorMessage ($counter)")
+            VelocitasLogger.error("$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Error
@@ -74,7 +76,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Debug Level") {
             counter++
-            Logger.debug("$errorMessage (%s)", counter)
+            VelocitasLogger.debug("$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Debug
@@ -84,7 +86,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Info Level") {
             counter++
-            Logger.info("$errorMessage (%s)", counter)
+            VelocitasLogger.info("$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Info
@@ -94,7 +96,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Warn Level") {
             counter++
-            Logger.warn("$errorMessage (%s)", counter)
+            VelocitasLogger.warn("$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Warn
@@ -104,7 +106,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Error Level") {
             counter++
-            Logger.error("$errorMessage (%s)", counter)
+            VelocitasLogger.error("$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLogger.lastLevel = LogLevel.Error
@@ -114,7 +116,7 @@ class LoggerTest : BehaviorSpec({
     }
 })
 
-object StringLogger : ILogger {
+object StringLogger : Logger {
     var lastLevel: LogLevel? = null
     var lastMessage: String? = null
 

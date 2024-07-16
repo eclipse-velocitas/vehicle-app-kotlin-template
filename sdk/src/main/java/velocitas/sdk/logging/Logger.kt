@@ -14,11 +14,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package velocitas.sdk
+package velocitas.sdk.logging
 
 import java.util.Date
 
-interface ILogger {
+interface Logger {
     /**
      * Log a message with info level.
      *
@@ -48,8 +48,8 @@ interface ILogger {
     fun debug(msg: String)
 }
 
-object Logger {
-    private var impl: ILogger = ConsoleLogger()
+object VelocitasLogger {
+    private var impl: Logger = ConsoleLogger()
 
     /**
      * Log a message with debug level.
@@ -95,12 +95,12 @@ object Logger {
         impl.error(formattedMsg)
     }
 
-    fun setLoggerImplementation(impl: ILogger) {
-        this.impl = impl
+    fun setLoggerImplementation(impl: Logger) {
+        VelocitasLogger.impl = impl
     }
 }
 
-class ConsoleLogger : ILogger {
+class ConsoleLogger : Logger {
     override fun debug(msg: String) {
         val formattedMsg = format("DEBUG", msg)
         println(formattedMsg)

@@ -16,6 +16,7 @@
 
 package velocitas.sdk
 
+import velocitas.sdk.logging.VelocitasLogger
 import velocitas.sdk.middleware.Middleware
 
 /**
@@ -26,7 +27,7 @@ abstract class VehicleApp {
      * Runs the Vehicle App.
      */
     fun run() {
-        Logger.info("Running App...")
+        VelocitasLogger.info("Running App...")
         Middleware.getInstance().start()
         Middleware.getInstance().waitUntilReady()
 
@@ -42,7 +43,7 @@ abstract class VehicleApp {
      * Stops the Vehicle App
      */
     fun stop() {
-        Logger.info("Stopping App...")
+        VelocitasLogger.info("Stopping App...")
 
         onStop()
 

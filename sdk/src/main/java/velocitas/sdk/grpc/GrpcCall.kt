@@ -17,7 +17,7 @@
 package velocitas.sdk.grpc
 
 import io.grpc.stub.StreamObserver
-import velocitas.sdk.Logger
+import velocitas.sdk.logging.VelocitasLogger
 
 abstract class GrpcCall {
     // grpc::ClientContext context
@@ -71,12 +71,12 @@ class GrpcStreamingResponseCall<TRequestType, TReplyType> : GrpcCall() {
             try {
                 onDataHandler?.invoke(value)
             } catch (e: Exception) {
-                Logger.error("${e.message}")
+                VelocitasLogger.error("${e.message}")
             }
         }
 
         override fun onError(t: Throwable) {
-            Logger.error("${t.message}")
+            VelocitasLogger.error("${t.message}")
         }
 
         override fun onCompleted() {

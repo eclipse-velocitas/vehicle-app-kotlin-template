@@ -16,6 +16,7 @@
 
 package velocitas.sdk
 
+import velocitas.sdk.logging.VelocitasLogger
 import java.util.Vector
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -60,7 +61,7 @@ class ThreadPool(var numWorkerThreads: Int) {
                     enqueue(polledJob)
                 }
             } catch (e: Exception) {
-                Logger.error("Uncaught Exception in job execution: ${e.message}")
+                VelocitasLogger.error("Uncaught Exception in job execution: ${e.message}")
             }
         }
     }
