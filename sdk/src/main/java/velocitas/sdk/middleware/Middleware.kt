@@ -17,6 +17,8 @@
 package velocitas.sdk.middleware
 
 import velocitas.getEnvVar
+import velocitas.sdk.NoArgumentSingletonHolder
+import velocitas.sdk.middleware.Middleware.Companion.TYPE_DEFINING_ENV_VAR_NAME
 
 abstract class Middleware protected constructor(
     /**
@@ -29,17 +31,23 @@ abstract class Middleware protected constructor(
     /**
      * Triggers the start of the middleware
      */
-    open fun start() { }
+    open fun start() {
+        // empty default implementation
+    }
 
     /**
      * Waits (blocks current thread) until the middleware is started and ready to use
      */
-    open fun waitUntilReady() { }
+    open fun waitUntilReady() {
+        // empty default implementation
+    }
 
     /**
      * Stops the middleware
      */
-    open fun stop() { }
+    open fun stop() {
+        // empty default implementation
+    }
 
     /**
      * Get the location description (e.g. uri) of the specified service name
@@ -62,38 +70,20 @@ abstract class Middleware protected constructor(
         return metadata.toMap()
     }
 
-    companion object {
+    companion object : NoArgumentSingletonHolder<Middleware>({
+        val middlewareType = getEnvVar(TYPE_DEFINING_ENV_VAR_NAME).lowercase()
+        if (middlewareType.isEmpty()) {
+            NativeMiddleware()
+        } else if (middlewareType == NativeMiddleware.TYPE_ID) {
+            NativeMiddleware()
+        } else {
+            error("Unknown middleware type '$middlewareType'")
+        }
+    }) {
         /**
          * Defines the name of the environment variable used to determine the middleware type to
          * be used.
          */
         const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE"
-
-        /**
-         * Returns a reference to a singleton instance of a concrete middleware class
-         *
-         * @return Middleware&
-         */
-        fun getInstance(): Middleware {
-            if (instance == null) {
-                instance = instantiate()
-            }
-
-            return instance as Middleware
-        }
-
-        @Volatile
-        private var instance: Middleware? = null
-
-        private fun instantiate(): Middleware {
-            val middlewareType = getEnvVar(TYPE_DEFINING_ENV_VAR_NAME).lowercase()
-            return if (middlewareType.isEmpty()) {
-                NativeMiddleware()
-            } else if (middlewareType == NativeMiddleware.TYPE_ID) {
-                NativeMiddleware()
-            } else {
-                error("Unknown middleware type '$middlewareType'")
-            }
-        }
     }
 }
