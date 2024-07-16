@@ -1,8 +1,9 @@
 [versions]
 agp = "8.5.1"
 annotationsApi = "6.0.53"
+detektFormatting = "1.23.6"
 grpcOkhttp = "1.64.0"
-kotlin = "1.9.0"
+kotlin = "1.9.23"
 coreKtx = "1.13.1"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -12,6 +13,7 @@ jetbrainsKotlinJvm = "2.0.0"
 junitJupiter = "5.10.1"
 kotestRunnerJunit5 = "5.9.1"
 jvmTarget = "17"
+detekt = "1.23.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,8 +28,10 @@ junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.re
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiter" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotestRunnerJunit5" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormatting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt"}

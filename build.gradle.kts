@@ -1,3 +1,6 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+
 /*
  * Copyright (c) 2024 Contributors to the Eclipse Foundation
  *
@@ -19,4 +22,55 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false // activate all available (even unstable) rules.
+    config.setFrom("$projectDir/config/detekt/detekt.yml")
+    baseline = file("$projectDir/config/detekt/baseline.xml")
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        txt.required.set(true)
+        md.required.set(true)
+    }
+
+    parallel = true
+    setSource(projectDir)
+    include("**/*.kt", "**/*.kts")
+    exclude("**/resources/**", "**/build/**", "**/node_modules/**")
+
+    jvmTarget = "1.8"
+}
+
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "1.8"
+
+    setSource(projectDir)
+    include("**/*.kt", "**/*.kts")
+    exclude("**/resources/**", "**/build/**")
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = "1.8"
+}
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "1.8"
+}
+
+dependencies {
+    detektPlugins(libs.detekt.formatting)
+}
+
+subprojects {
+    afterEvaluate {
+        tasks.named("check") {
+            finalizedBy(rootProject.tasks.named("detekt"))
+        }
+    }
 }
