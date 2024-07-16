@@ -16,7 +16,6 @@
 
 package velocitas.sdk.middleware
 
-import velocitas.getEnvVar
 import velocitas.sdk.logging.VelocitasLogger
 import velocitas.sdk.parser.SimpleUrlParser
 

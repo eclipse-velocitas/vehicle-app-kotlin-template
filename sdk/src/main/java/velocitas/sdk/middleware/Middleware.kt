@@ -70,6 +70,14 @@ abstract class Middleware protected constructor(
         return metadata.toMap()
     }
 
+    protected fun getEnvVar(varName: String, defaultValue: String = ""): String {
+        val envVar = System.getenv(varName)
+        if (envVar != null) {
+            return envVar
+        }
+        return defaultValue
+    }
+
     companion object : NoArgumentSingletonHolder<Middleware>({
         val middlewareType = getEnvVar(TYPE_DEFINING_ENV_VAR_NAME).lowercase()
         if (middlewareType.isEmpty()) {
