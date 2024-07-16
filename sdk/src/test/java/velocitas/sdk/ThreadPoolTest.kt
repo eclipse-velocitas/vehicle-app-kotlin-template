@@ -36,9 +36,12 @@ class ThreadPoolTest : BehaviorSpec({
     duplicateTestNameMode = DuplicateTestNameMode.Silent
 
     val fakeJobs = LinkedList<FakeJob>()
-    val classUnderTest = ThreadPool(2)
+    val classUnderTest = ThreadPool()
 
-    fun createAndExecuteJob(timeout: Long = 1, timeUnit: TimeUnit = TimeUnit.SECONDS): Boolean {
+    val defaultTimeout = 100L
+    val defaultTimeUnit = TimeUnit.MILLISECONDS
+
+    fun createAndExecuteJob(timeout: Long = defaultTimeout, timeUnit: TimeUnit = defaultTimeUnit): Boolean {
         val fakeJob = FakeJob()
         fakeJobs.add(fakeJob)
         classUnderTest.enqueue(fakeJob)
@@ -46,7 +49,7 @@ class ThreadPoolTest : BehaviorSpec({
         return fakeJob.waitForExecution(timeout, timeUnit)
     }
 
-    fun finishJob(job: FakeJob, timeout: Long = 1, timeUnit: TimeUnit = TimeUnit.SECONDS): Boolean {
+    fun finishJob(job: FakeJob, timeout: Long = defaultTimeout, timeUnit: TimeUnit = defaultTimeUnit): Boolean {
         job.finish()
         return job.waitForFinished(timeout, timeUnit)
     }
@@ -58,7 +61,7 @@ class ThreadPoolTest : BehaviorSpec({
         }
     }
 
-    fun occupyAllWorkers(timeout: Long = 1, timeUnit: TimeUnit = TimeUnit.SECONDS): Boolean {
+    fun occupyAllWorkers(timeout: Long = defaultTimeout, timeUnit: TimeUnit = defaultTimeUnit): Boolean {
         val times = classUnderTest.numWorkerThreads
         repeat(times) {
             if (!createAndExecuteJob(timeout, timeUnit)) {
@@ -130,10 +133,10 @@ class ThreadPoolTest : BehaviorSpec({
             }
 
             and("When it is finished") {
-                job.finish()
+                finishJob(job)
 
-                then("It should not be triggered again") {
-                    job.waitForExecution(100, TimeUnit.MILLISECONDS) shouldBe false
+                then("It should not be executed again") {
+                    job.waitForExecution() shouldBe false
                     job.atomicExecutionCount.get() shouldBe 1
                 }
             }
@@ -144,7 +147,7 @@ class ThreadPoolTest : BehaviorSpec({
         occupyAllWorkers()
 
         `when`("A new Job is enqueued") {
-            val result = createAndExecuteJob(100, TimeUnit.MILLISECONDS)
+            val result = createAndExecuteJob()
 
             then("The job is not executed") {
                 result shouldBe false
@@ -153,7 +156,7 @@ class ThreadPoolTest : BehaviorSpec({
 
         and("A currently running job is finished") {
             val fakeJob = fakeJobs.first()
-            fakeJob.finish()
+            finishJob(fakeJob)
 
             then("It should be executed") {
                 val lastFakeJob = fakeJobs.last()
@@ -174,7 +177,7 @@ class ThreadPoolTest : BehaviorSpec({
                 finishJob(recurringJob)
 
                 then("It should not be executed again") {
-                    recurringJob.waitForExecution(100, TimeUnit.MILLISECONDS) shouldBe false
+                    recurringJob.waitForExecution() shouldBe false
                     recurringJob.atomicExecutionCount.get() shouldBe 1
                 }
             }
@@ -183,7 +186,7 @@ class ThreadPoolTest : BehaviorSpec({
                 finishJob(recurringJob)
 
                 then("It should be executed again") {
-                    recurringJob.waitForExecution(10, TimeUnit.MILLISECONDS) shouldBe true
+                    recurringJob.waitForExecution() shouldBe true
                     recurringJob.atomicExecutionCount.get() shouldBe 2
 
                     recurringJob.cancel()
@@ -206,13 +209,13 @@ class ThreadPoolTest : BehaviorSpec({
     }
 })
 
-open class FakeJob : IJob {
+open class FakeJob : ExecutorJob {
     val atomicExecutionCount = AtomicInteger(0)
     val atomicExecutionState = AtomicReference(State.Initialized)
     private val executionMutex = Any()
     private var throwException = false
 
-    var countDownLatch: CountDownLatch? = null
+    private var countDownLatch: CountDownLatch? = null
 
     override fun execute() {
         countDownLatch = CountDownLatch(1)
@@ -223,11 +226,12 @@ open class FakeJob : IJob {
 
         countDownLatch?.await()
 
+        if (throwException) {
+            error("test exception")
+        }
+
         synchronized(executionMutex) {
             atomicExecutionState.set(State.Finished)
-        }
-        if (throwException) {
-            error("throwing test exception")
         }
     }
 

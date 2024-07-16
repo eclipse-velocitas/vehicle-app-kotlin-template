@@ -18,7 +18,7 @@ package velocitas.sdk
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-interface IJob {
+interface ExecutorJob {
 
     /**
      * Execute the job.
@@ -39,7 +39,7 @@ interface IJob {
 /**
  * A nonrecurring job.
  */
-open class Job(private val function: (() -> Unit)) : IJob {
+open class Job(private val function: (() -> Unit)) : ExecutorJob {
     @Synchronized
     override fun execute() {
         function()

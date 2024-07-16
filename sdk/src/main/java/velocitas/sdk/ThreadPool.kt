@@ -22,14 +22,17 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
+private const val MAX_NUMBER_PENDING_JOBS = 1_000
+private const val DEFAULT_NUMBER_WORKER_THREADS = 2
+
 /**
  * Manages a pool of threads which are capable of executing jobs asynchronously.
  */
 class ThreadPool(var numWorkerThreads: Int) {
-    constructor() : this(2)
+    constructor() : this(DEFAULT_NUMBER_WORKER_THREADS)
 
     private val workerThreads = Vector<Thread>()
-    private val jobs = ArrayBlockingQueue<IJob>(1000)
+    private val jobs = ArrayBlockingQueue<ExecutorJob>(MAX_NUMBER_PENDING_JOBS)
     private val isRunning: AtomicBoolean = AtomicBoolean(true)
 
     init {
@@ -42,7 +45,7 @@ class ThreadPool(var numWorkerThreads: Int) {
         }
     }
 
-    fun enqueue(job: IJob) {
+    fun enqueue(job: ExecutorJob) {
         jobs.add(job)
     }
 
