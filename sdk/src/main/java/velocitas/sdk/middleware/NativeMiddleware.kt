@@ -16,16 +16,20 @@
 
 package velocitas.sdk.middleware
 
-import velocitas.SimpleUrlParse
 import velocitas.getEnvVar
 import velocitas.sdk.Logger
+import velocitas.sdk.parser.SimpleUrlParser
 
 class NativeMiddleware : Middleware(TYPE_ID) {
 
     override fun getServiceLocation(serviceName: String): String {
         val envVarName = getServiceEnvVarName(serviceName)
         val envVar = getEnvVar(envVarName)
-        val serviceAddress: String = SimpleUrlParse(envVar).netLocation
+
+        val simpleUrlParser = SimpleUrlParser()
+        val result: SimpleUrlParser.Result = simpleUrlParser.parse(envVar)
+        val serviceAddress = result.netLocation
+
         if (serviceAddress.isNotEmpty()) {
             return serviceAddress
         }
@@ -57,8 +61,9 @@ class NativeMiddleware : Middleware(TYPE_ID) {
             val filteredService =
                 DEFAULT_LOCATIONS.entries.find { it.key == serviceName.lowercase() }
             if (filteredService != null) {
-                val parse = SimpleUrlParse(filteredService.value)
-                return parse.netLocation
+                val simpleUrlParser = SimpleUrlParser()
+                val result = simpleUrlParser.parse(filteredService.value)
+                return result.netLocation
             }
             return null
         }
