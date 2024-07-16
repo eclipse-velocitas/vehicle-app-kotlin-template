@@ -120,23 +120,23 @@ object StringLogger : Logger {
     var lastLevel: LogLevel? = null
     var lastMessage: String? = null
 
-    override fun info(msg: String) {
+    override fun info(message: String) {
         lastLevel = LogLevel.Info
-        lastMessage = msg
+        lastMessage = message
     }
 
-    override fun warn(msg: String) {
+    override fun warn(message: String) {
         lastLevel = LogLevel.Warn
-        lastMessage = msg
+        lastMessage = message
     }
 
-    override fun error(msg: String) {
+    override fun error(message: String) {
         lastLevel = LogLevel.Error
-        lastMessage = msg
+        lastMessage = message
     }
 
-    override fun debug(msg: String) {
+    override fun debug(message: String) {
         lastLevel = LogLevel.Debug
-        lastMessage = msg
+        lastMessage = message
     }
 }

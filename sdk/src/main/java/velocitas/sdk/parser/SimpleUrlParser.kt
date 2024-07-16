@@ -32,6 +32,9 @@ class SimpleUrlParser {
     private val schemePartStart = "//"
     private val simplifiedSchemeSeparator = "://"
 
+    /**
+     * Parses the provided url and returns a [Result].
+     */
     fun parse(url: String): Result {
         var scheme = ""
         var netLocation = ""

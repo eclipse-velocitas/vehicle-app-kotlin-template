@@ -16,45 +16,43 @@
 
 package velocitas.sdk.middleware
 
-import velocitas.getEnvVar
 import velocitas.sdk.NoArgumentSingletonHolder
 import velocitas.sdk.middleware.Middleware.Companion.TYPE_DEFINING_ENV_VAR_NAME
+import velocitas.sdk.middleware.Middleware.Companion.getEnvVar
 
 abstract class Middleware protected constructor(
     /**
-     * The type identifier of the concrete middleware implementation
+     * The type identifier of the concrete middleware implementation.
      */
     val typeId: String,
 ) {
     private val metadata: Metadata = Metadata()
 
     /**
-     * Triggers the start of the middleware
+     * Triggers the start of the middleware.
      */
     open fun start() {
         // empty default implementation
     }
 
     /**
-     * Waits (blocks current thread) until the middleware is started and ready to use
+     * Waits (and blocks current thread) until the middleware is started and ready to use.
      */
     open fun waitUntilReady() {
         // empty default implementation
     }
 
     /**
-     * Stops the middleware
+     * Stops the middleware.
      */
     open fun stop() {
         // empty default implementation
     }
 
     /**
-     * Get the location description (e.g. uri) of the specified service name
+     * Get the location description (e.g. uri) for the specified [serviceName] and returns the location of this service.
      *
-     * @param serviceName Name of the service to get the location description for
-     * @return representing the location description
-     * @throws RuntimeException if the service location cannot be determined
+     * @throws RuntimeException will be thrown if the service location could not be determined.
      */
     open fun getServiceLocation(serviceName: String): String {
         return ""
@@ -68,14 +66,6 @@ abstract class Middleware protected constructor(
      */
     open fun getMetadata(serviceName: String): Map<String, String> {
         return metadata.toMap()
-    }
-
-    protected fun getEnvVar(varName: String, defaultValue: String = ""): String {
-        val envVar = System.getenv(varName)
-        if (envVar != null) {
-            return envVar
-        }
-        return defaultValue
     }
 
     companion object : NoArgumentSingletonHolder<Middleware>({
@@ -93,5 +83,17 @@ abstract class Middleware protected constructor(
          * be used.
          */
         const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE"
+
+        /**
+         * Retrieves the environment variable for the given [varName] and returns it's value. If no environment variable
+         * exist the [defaultValue] will be returned.
+         */
+        fun getEnvVar(varName: String, defaultValue: String = ""): String {
+            val envVar = System.getenv(varName)
+            if (envVar != null) {
+                return envVar
+            }
+            return defaultValue
+        }
     }
 }

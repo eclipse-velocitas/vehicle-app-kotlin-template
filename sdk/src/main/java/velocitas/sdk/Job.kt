@@ -37,22 +37,35 @@ interface ExecutorJob {
 }
 
 /**
- * A nonrecurring job.
+ * A non-recurring job. Will be executed once and afterwards removed from the JobQueue. Should be used together with
+ * the [ThreadPool].
+ *
  */
-open class Job(private val function: (() -> Unit)) : ExecutorJob {
+open class Job(
+    /**
+     * Lambda Function to be executed.
+     */
+    private val function: (() -> Unit),
+) : ExecutorJob {
+
     @Synchronized
     override fun execute() {
         function()
     }
 
+    /**
+     * Blocks other threads until [execute] finished successful.
+     */
     @Synchronized
     fun waitForTermination() {
-        // empty default implementation
+        // blocking is achieved here by using @Synchronized annotation
     }
 }
 
 /**
- * A recurring job which can be cancelled manually.
+ * A recurring job. Will be executed continuously until cancel is called or the [ThreadPool] is stopped. Once the
+ * Job finished successfully it will be added again to the working queue. This means the time between two consecutive
+ * executions of the recurring job might vary.
  */
 open class RecurringJob(function: (() -> Unit)) : Job(function) {
     private val isCancelled: AtomicBoolean = AtomicBoolean(false)
@@ -68,7 +81,7 @@ open class RecurringJob(function: (() -> Unit)) : Job(function) {
     }
 
     /**
-     * Prevents execution of the function once called.
+     * Prevents further execution of the function once called.
      */
     fun cancel() {
         isCancelled.set(true)

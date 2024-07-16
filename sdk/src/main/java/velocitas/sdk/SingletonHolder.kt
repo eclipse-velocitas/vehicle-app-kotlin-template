@@ -16,24 +16,36 @@
 
 package velocitas.sdk
 
-open class SingletonHolder<out T, in A>(private val constructor: (A) -> T) {
+/**
+ * Creates a Singleton [T] instance. Creation of the Singleton requires no arguments.
+ */
+abstract class NoArgumentSingletonHolder<out T>(private val constructor: () -> T) {
 
     @Volatile
     private var instance: T? = null
 
-    fun getInstance(arg: A): T =
-        instance ?: synchronized(this) {
-            instance ?: constructor(arg).also { instance = it }
-        }
-}
-
-open class NoArgumentSingletonHolder<out T>(private val constructor: () -> T) {
-
-    @Volatile
-    private var instance: T? = null
-
+    /**
+     * Returns the Singleton Instance.
+     */
     fun getInstance(): T =
         instance ?: synchronized(this) {
             instance ?: constructor().also { instance = it }
+        }
+}
+
+/**
+ * Creates a Singleton [T] instance. Creation of the Singleton requires one argument of type [A].
+ */
+abstract class SingletonHolder<out T, in A>(private val constructor: (A) -> T) {
+
+    @Volatile
+    private var instance: T? = null
+
+    /**
+     * Returns the Singleton Instance.
+     */
+    fun getInstance(arg: A): T =
+        instance ?: synchronized(this) {
+            instance ?: constructor(arg).also { instance = it }
         }
 }

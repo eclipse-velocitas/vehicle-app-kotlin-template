@@ -32,11 +32,6 @@ abstract class VehicleApp {
         Middleware.getInstance().waitUntilReady()
 
         onStart()
-
-        // TODO: Fix busy waiting
-        while (true) {
-            Thread.sleep(1)
-        }
     }
 
     /**

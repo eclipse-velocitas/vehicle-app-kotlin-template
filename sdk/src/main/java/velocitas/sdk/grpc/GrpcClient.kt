@@ -48,13 +48,5 @@ class GrpcClient {
                 iterator.remove()
             }
         }
-
-        // static auto isComplete = [](const auto& activeCall) { return activeCall->m_isComplete; };
-
-        // {
-        //    std::scoped_lock<std::mutex> lock(m_mutex);
-        //    m_activeCalls.erase(std::remove_if(m_activeCalls.begin(), m_activeCalls.end(), isComplete),
-        //        m_activeCalls.end());
-        // }
     }
 }

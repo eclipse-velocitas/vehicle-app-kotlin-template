@@ -19,23 +19,18 @@ package velocitas.sdk
 /**
  * Status of an asynchronous request.
  *
- * @constructor Construct a new Status object without any errors.
+ * @constructor Construct a new Status object without a specified error message. Default value of errorMessage is an
+ * empty String.
  */
 data class Status(
     /**
-     * Returns whether the reported status is OK or not.
-     *
-     * @return true   Status is OK
-     * @return false  Status is not OK
+     * Return the error message stored within the status. May be empty if status is ok.
      */
-    val errorMessage: String? = null,
+    val errorMessage: String = "",
 ) {
     /**
      * Returns whether the reported status is OK or not.
-     *
-     * @return true   Status is OK
-     * @return false  Status is not OK
      */
     val isOk
-        get() = errorMessage == null
+        get() = errorMessage.isEmpty()
 }

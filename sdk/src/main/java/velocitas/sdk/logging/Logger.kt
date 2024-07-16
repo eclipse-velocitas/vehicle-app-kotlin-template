@@ -18,109 +18,103 @@ package velocitas.sdk.logging
 
 import java.util.Date
 
+/**
+ * A generic logger interface. Can be used to switch the underlying logging strategy of the VelocitasLogger.
+ */
 interface Logger {
     /**
-     * Log a message with info level.
-     *
-     * @param msg The message to log.
+     * Log a [message] with info level.
      */
-    fun info(msg: String)
+    fun info(message: String)
 
     /**
-     * Log a message with warn level.
-     *
-     * @param msg The message to log.
+     * Log a [message] with warn level.
      */
-    fun warn(msg: String)
+    fun warn(message: String)
 
     /**
-     * Log a message with error level.
-     *
-     * @param msg The message to log.
+     * Log a [message] with error level.
      */
-    fun error(msg: String)
+    fun error(message: String)
 
     /**
-     * Log a message with debug level.
-     *
-     * @param msg The message to log.
+     * Log a [message] with debug level.
      */
-    fun debug(msg: String)
+    fun debug(message: String)
 }
 
+/**
+ * Component used for Logging. The underlying strategy how to log can be switched using the [setLoggerImplementation]
+ * method.
+ */
 object VelocitasLogger {
     private var impl: Logger = ConsoleLogger()
 
     /**
-     * Log a message with debug level.
-     *
-     * @param msg   The format message.
-     * @param args  The format arguments.
+     * Logs a [message] with debug level and uses the variadic list of [arguments] to replace them within the provided
+     * message.
      */
-    fun debug(msg: String, vararg args: Any?) {
-        val formattedMsg = msg.format(args)
+    fun debug(message: String, vararg arguments: Any?) {
+        val formattedMsg = message.format(arguments)
         impl.debug(formattedMsg)
     }
 
     /**
-     * Log a message with info level.
-     *
-     * @param msg   The format message.
-     * @param args  The format arguments.
+     * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
+     * message.
      */
-    fun info(msg: String, vararg args: Any?) {
-        val formattedMsg = msg.format(args)
+    fun info(message: String, vararg arguments: Any?) {
+        val formattedMsg = message.format(arguments)
         impl.info(formattedMsg)
     }
 
     /**
-     * Log a message with warn level.
-     *
-     * @param msg   The format message.
-     * @param args  The format arguments.
+     * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
+     * message.
      */
-    fun warn(msg: String, vararg args: Any?) {
-        val formattedMsg = msg.format(args)
+    fun warn(message: String, vararg arguments: Any?) {
+        val formattedMsg = message.format(arguments)
         impl.warn(formattedMsg)
     }
 
     /**
-     * Log a message with error level.
-     *
-     * @param msg   The format message.
-     * @param args  The format arguments.
+     * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
+     * message.
      */
-    fun error(msg: String, vararg args: Any?) {
-        val formattedMsg = msg.format(args)
+    fun error(message: String, vararg arguments: Any?) {
+        val formattedMsg = message.format(arguments)
         impl.error(formattedMsg)
     }
 
+    /**
+     * Switches the underlying strategy how to log messages.
+     */
     fun setLoggerImplementation(impl: Logger) {
         VelocitasLogger.impl = impl
     }
 }
 
 class ConsoleLogger : Logger {
-    override fun debug(msg: String) {
-        val formattedMsg = format("DEBUG", msg)
+    override fun debug(message: String) {
+        val formattedMsg = format("DEBUG", message)
         println(formattedMsg)
         System.out.flush()
     }
 
-    override fun info(msg: String) {
-        val formattedMsg = format("INFO", msg)
+    override fun info(message: String) {
+        val formattedMsg = format("INFO", message)
         println(formattedMsg)
         System.out.flush()
     }
 
-    override fun warn(msg: String) {
-        val formattedMsg = format("WARN", msg)
+    override fun warn(message: String) {
+        val formattedMsg = format("WARN", message)
         println(formattedMsg)
         System.out.flush()
     }
 
-    override fun error(msg: String) {
-        val formattedMsg = format("ERROR", msg)
+    override fun error(message: String) {
+        val formattedMsg = format("ERROR", message)
         System.err.println(formattedMsg)
         System.err.flush()
     }

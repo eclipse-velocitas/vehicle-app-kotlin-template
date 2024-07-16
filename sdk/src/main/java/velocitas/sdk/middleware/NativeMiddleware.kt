@@ -19,6 +19,9 @@ package velocitas.sdk.middleware
 import velocitas.sdk.logging.VelocitasLogger
 import velocitas.sdk.parser.SimpleUrlParser
 
+/**
+ * Native Middleware implementation.
+ */
 class NativeMiddleware : Middleware(TYPE_ID) {
 
     override fun getServiceLocation(serviceName: String): String {

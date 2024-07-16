@@ -45,15 +45,22 @@ class ThreadPool(var numWorkerThreads: Int) {
         }
     }
 
+    /**
+     * Enqueue a new [job] to be processed by one of the worker threads. No more than [numWorkerThreads] jobs are
+     * processed at the same time.
+     */
     fun enqueue(job: ExecutorJob) {
         jobs.add(job)
     }
 
+    /**
+     * The ThreadPool will finish it's currently running jobs and no longer process new jobs.
+     */
     fun shutdown() {
         isRunning.set(false)
     }
 
-    @Suppress("TooGenericExceptionCaught") // third party code could throw any exception
+    @Suppress("TooGenericExceptionCaught") // executed code could throw any exception
     private fun threadLoop() {
         while (isRunning.get()) {
             val polledJob = jobs.poll() ?: continue

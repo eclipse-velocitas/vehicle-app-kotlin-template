@@ -20,8 +20,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Empty result structure which can be used in case an AsyncResult
- *        does not return any valuable information other than its success.
+ * Empty result structure which can be used in case an AsyncResult does not return any valuable information other than
+ * its success.
  */
 class VoidResult
 
@@ -35,9 +35,7 @@ class AsyncResult<TResultType> {
     private val countDownLatch = CountDownLatch(1)
 
     /**
-     * Inserts the result and notifies any waiters.
-     *
-     * @param result  Result to insert.
+     * Inserts the [result] and notifies any waiters.
      */
     fun insertResult(result: TResultType) {
         try {
@@ -52,9 +50,8 @@ class AsyncResult<TResultType> {
     }
 
     /**
-     * Inserts a new error and notifies any waiters.
-     *
-     * @param error Status containing error information.
+     * Inserts a new [error] status and notifies any waiters. The [error] contains more information about the occurred
+     * error.
      */
     fun insertError(error: Status) {
         try {
@@ -69,12 +66,11 @@ class AsyncResult<TResultType> {
     }
 
     /**
-     * Blocks the calling thread until the result is available.
+     * Blocks the calling thread until the result is available and returns the result of the async operation once it
+     * is complete.
      *
-     * @throw AsyncException     if there is any issues during async invocation.
-     * @throw RuntimeException   if the API usage is wrong.
-     *
-     * @return TResultType    Result of the async operation once it completes.
+     * @throw AsyncException will be thrown if there is any issues during async invocation.
+     * @throw IllegalStateException will be thrown if the user already registered an [onResult] callback.
      */
     fun await(): TResultType {
         check(resultCallback == null) {
@@ -92,11 +88,10 @@ class AsyncResult<TResultType> {
     }
 
     /**
-     * Calls the specified callback when the result is available.
-     *        The callback invocation is done by a worker thread.
+     * Sets the specified [onResultCallback] which should be called when the result is available. The callback
+     * invocation is done by a worker thread. Returns the AsyncResult for method chaining.
      *
-     * @param onResultCallback The callback to invoke.
-     * @return AsyncResult     This for method chaining.
+     * @throws IllegalStateException will be thrown if another thread called [await] and is now waiting for the result.
      */
     fun onResult(onResultCallback: ((TResultType) -> Unit)): AsyncResult<TResultType> {
         check(!isAwaiting.get()) {
@@ -108,11 +103,8 @@ class AsyncResult<TResultType> {
     }
 
     /**
-     * Calls the specified callback when an error occurs during async execution.
-     *        The callback invocation is done by a worker thread.
-     *
-     * @param onErrorCallback The callback to invoke.
-     * @return AsyncResult    This for method chaining.
+     * Sets the specified [onErrorCallback] which should be called when an error occurs during async execution.
+     * The callback invocation is done by a worker thread. Returns the AsyncResult for method chaining.
      */
     fun onError(onErrorCallback: ((Status) -> Unit)): AsyncResult<TResultType> {
         errorCallback = onErrorCallback
@@ -121,9 +113,7 @@ class AsyncResult<TResultType> {
     }
 
     /**
-     * @brief Return if the result is currently being awaited.
-     *
-     * @return true if the AsyncResult is being waited on, or false otherwise
+     * Returns true if the result is currently being waited for or false otherwise.
      */
     fun isInAwaitingState(): Boolean {
         return isAwaiting.get()

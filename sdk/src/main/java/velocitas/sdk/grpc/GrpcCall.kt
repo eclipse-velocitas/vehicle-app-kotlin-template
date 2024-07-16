@@ -30,42 +30,65 @@ abstract class GrpcCall {
  * @param TRequestType The data type of the request.
  * @param TReplyType   The data type of the reply.
  */
-class GrpcSingleResponseCall<TRequestType, TReplyType> : GrpcCall() {
+class SingleResponseGrpcCall<TRequestType, TReplyType> : GrpcCall() {
+    /**
+     * The request of the GrpcCall.
+     */
     var request: TRequestType? = null
+
+    /**
+     * The Response of the GrpcCall.
+     */
     var reply: TReplyType? = null
 }
 
-class GrpcStreamingResponseCall<TRequestType, TReplyType> : GrpcCall() {
-
+/**
+ * A GRPC call where a request is followed up by multiple streamed replies.
+ *
+ * @param TRequestType The data type of the request.
+ * @param TReplyType   The data type of the reply.
+ */
+class StreamingResponseGrpcCall<TRequestType, TReplyType> : GrpcCall() {
+    /**
+     * The request of the GrpcCall.
+     */
     var request: TRequestType? = null
         private set
 
     private val readReactor: ReadReactor<TRequestType, TReplyType> = ReadReactor(this)
 
-    fun startCall(): GrpcStreamingResponseCall<TRequestType, TReplyType> {
-        // readReactor.startCall()
-        // readReactor.startRead(readReactor.reply!!) // TODO check this
+    /**
+     * Executes the GrpcCall. Sends the request and listens for updates.
+     */
+    fun startCall(): StreamingResponseGrpcCall<TRequestType, TReplyType> {
+        // TODO HOW TO IMPLEMENT THIS?
         return this
     }
 
-    fun onData(handler: ((TReplyType) -> Unit)): GrpcStreamingResponseCall<TRequestType, TReplyType> {
+    /**
+     * Sets the [handler] to whom the replies received by the stream are sent.
+     */
+    fun onData(handler: ((TReplyType) -> Unit)): StreamingResponseGrpcCall<TRequestType, TReplyType> {
         readReactor.onDataHandler = handler
         return this
     }
 
-    fun onFinish(handler: (() -> Unit)): GrpcStreamingResponseCall<TRequestType, TReplyType> {
+    /**
+     * Sets the [handler] which should be notified about the stream reaching it's end.
+     */
+    fun onFinish(handler: (() -> Unit)): StreamingResponseGrpcCall<TRequestType, TReplyType> {
         readReactor.onFinishHandler = handler
         return this
     }
 
-    class ReadReactor<TRequestType, TReplyType>(
-        private val parent: GrpcStreamingResponseCall<TRequestType, TReplyType>,
+    private class ReadReactor<TRequestType, TReplyType>(
+        private val parent: StreamingResponseGrpcCall<TRequestType, TReplyType>,
     ) : StreamObserver<TReplyType> {
         var reply: TReplyType? = null
         var onDataHandler: ((TReplyType) -> Unit)? = null
         var onFinishHandler: (() -> Unit)? = null
 
-        @Suppress("TooGenericExceptionCaught") // third party code could throw any exception
+        @Suppress("TooGenericExceptionCaught") // executed code could throw any exception
         override fun onNext(value: TReplyType) {
             this.reply = value
             try {
