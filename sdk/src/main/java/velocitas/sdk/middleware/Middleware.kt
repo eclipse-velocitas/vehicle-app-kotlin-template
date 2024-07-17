@@ -18,7 +18,6 @@ package velocitas.sdk.middleware
 
 import velocitas.sdk.NoArgumentSingletonHolder
 import velocitas.sdk.middleware.Middleware.Companion.TYPE_DEFINING_ENV_VAR_NAME
-import velocitas.sdk.middleware.Middleware.Companion.getEnvVar
 
 abstract class Middleware protected constructor(
     /**
@@ -64,12 +63,13 @@ abstract class Middleware protected constructor(
      * @param serviceName Name of the service to communicate with
      * @return Metadata
      */
-    open fun getMetadata(serviceName: String): Map<String, String> {
-        return metadata.toMap()
+    open fun getMetadata(serviceName: String): Metadata {
+        return metadata
     }
 
     companion object : NoArgumentSingletonHolder<Middleware>({
-        val middlewareType = getEnvVar(TYPE_DEFINING_ENV_VAR_NAME).lowercase()
+        val envVar = System.getenv(TYPE_DEFINING_ENV_VAR_NAME) ?: ""
+        val middlewareType = envVar.lowercase()
         if (middlewareType.isEmpty()) {
             NativeMiddleware()
         } else if (middlewareType == NativeMiddleware.TYPE_ID) {
@@ -83,17 +83,5 @@ abstract class Middleware protected constructor(
          * be used.
          */
         const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE"
-
-        /**
-         * Retrieves the environment variable for the given [varName] and returns it's value. If no environment variable
-         * exist the [defaultValue] will be returned.
-         */
-        fun getEnvVar(varName: String, defaultValue: String = ""): String {
-            val envVar = System.getenv(varName)
-            if (envVar != null) {
-                return envVar
-            }
-            return defaultValue
-        }
     }
 }

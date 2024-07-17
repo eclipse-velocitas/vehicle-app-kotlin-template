@@ -26,7 +26,7 @@ class NativeMiddleware : Middleware(TYPE_ID) {
 
     override fun getServiceLocation(serviceName: String): String {
         val envVarName = getServiceEnvVarName(serviceName)
-        val envVar = getEnvVar(envVarName)
+        val envVar = System.getenv(envVarName) ?: ""
 
         val simpleUrlParser = SimpleUrlParser()
         val result: SimpleUrlParser.Result = simpleUrlParser.parse(envVar)
