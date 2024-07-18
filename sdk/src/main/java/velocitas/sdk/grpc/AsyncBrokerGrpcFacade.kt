@@ -17,6 +17,7 @@
 package velocitas.sdk.grpc
 
 import io.grpc.Channel
+import io.grpc.Context
 import io.grpc.stub.StreamObserver
 import org.eclipse.kuksa.proto.v2.KuksaValV2.*
 import org.eclipse.kuksa.proto.v2.Types.Datapoint
@@ -148,6 +149,7 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
      * Subscribes to a set of [signalIds].
      * If the request is successfully executed the responses will be delivered to the [responseHandler], if an error
      * occurs it will be delivered to the [errorHandler].
+     * Returns a cancellableContext to cancel the active subscriptions.
      *
      * The server might respond with the following GRPC error codes:
      *    NOT_FOUND if any of the signals are non-existent.
@@ -157,7 +159,7 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
         signalIds: List<SignalID>,
         responseHandler: ((SubscribeResponse) -> Unit),
         errorHandler: ((Throwable) -> Unit),
-    ) {
+    ): Context.CancellableContext {
         val request = SubscribeRequest.newBuilder()
             .addAllSignalIds(signalIds)
             .build()
@@ -179,7 +181,12 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
                 }
             }
 
-        asyncStub.subscribe(callData.request, responseObserver)
+        val currentContext = Context.current()
+        val cancellableContext = currentContext.withCancellation()
+        cancellableContext.run {
+            asyncStub.subscribe(callData.request, responseObserver)
+        }
+        return cancellableContext
     }
 
     /**
