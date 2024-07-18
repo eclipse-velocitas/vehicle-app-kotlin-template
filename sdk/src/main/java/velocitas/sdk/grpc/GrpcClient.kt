@@ -19,7 +19,10 @@ package velocitas.sdk.grpc
 import velocitas.sdk.RecurringJob
 import velocitas.sdk.ThreadPool
 
-class GrpcClient {
+/**
+ * GrpcClient used to communicate with a GrpcService. It tracks the number of active GrpcCalls.
+ */
+open class GrpcClient {
     private val recurringJob: RecurringJob
     private val activeCalls = mutableListOf<GrpcCall>()
 
@@ -35,6 +38,9 @@ class GrpcClient {
         ThreadPool.getInstance().enqueue(recurringJob)
     }
 
+    /**
+     * Adds an active GrpcCall.
+     */
     @Synchronized
     fun addActiveCall(call: GrpcCall) {
         activeCalls.add(call)

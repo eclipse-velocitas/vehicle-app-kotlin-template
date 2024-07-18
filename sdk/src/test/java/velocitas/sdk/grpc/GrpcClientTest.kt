@@ -26,7 +26,7 @@ class GrpcClientTest : BehaviorSpec({
         val grpcClient = GrpcClient()
 
         `when`("An active call is added") {
-            val call = SingleResponseGrpcCall<String, String>()
+            val call = SingleResponseGrpcCall<TestRequest, TestResponse>(TestRequest)
             grpcClient.addActiveCall(call)
 
             then("There should be one active call") {
@@ -37,7 +37,7 @@ class GrpcClientTest : BehaviorSpec({
         }
 
         `when`("A second active call is added") {
-            val call = SingleResponseGrpcCall<String, String>()
+            val call = SingleResponseGrpcCall<TestRequest, TestResponse>(TestRequest)
             grpcClient.addActiveCall(call)
 
             then("There should be two active calls") {
@@ -58,3 +58,6 @@ class GrpcClientTest : BehaviorSpec({
         }
     }
 })
+
+object TestRequest
+object TestResponse

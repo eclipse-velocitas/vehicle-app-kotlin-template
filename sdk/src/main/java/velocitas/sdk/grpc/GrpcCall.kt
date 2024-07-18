@@ -28,83 +28,69 @@ abstract class GrpcCall {
  * A GRPC call where a request is followed up by a single reply.
  *
  * @param TRequestType The data type of the request.
- * @param TReplyType   The data type of the reply.
+ * @param TResponseType The data type of the response.
  */
-class SingleResponseGrpcCall<TRequestType, TReplyType> : GrpcCall() {
+class SingleResponseGrpcCall<TRequestType, TResponseType>(
     /**
      * The request of the GrpcCall.
      */
-    var request: TRequestType? = null
+    var request: TRequestType,
+) : GrpcCall() {
 
     /**
      * The Response of the GrpcCall.
      */
-    var reply: TReplyType? = null
+    var response: TResponseType? = null
 }
 
 /**
  * A GRPC call where a request is followed up by multiple streamed replies.
  *
- * @param TRequestType The data type of the request.
- * @param TReplyType   The data type of the reply.
+ * @param TRequestType    The data type of the request.
+ * @param TResponseType   The data type of the reply.
  */
-class StreamingResponseGrpcCall<TRequestType, TReplyType> : GrpcCall() {
+class StreamingResponseGrpcCall<TRequestType, TResponseType>(
     /**
      * The request of the GrpcCall.
      */
-    var request: TRequestType? = null
-        private set
+    val request: TRequestType? = null,
+) : GrpcCall() {
+    var lastResponse: TResponseType? = null
+}
 
-    private val readReactor: ReadReactor<TRequestType, TReplyType> = ReadReactor(this)
+/**
+ * A GRPC call where a request is followed up by multiple streamed replies.
+ *
+ * @param TRequestType    The data type of the request.
+ * @param TResponseType   The data type of the reply.
+ */
+class BidiStreamingResponseGrpcCall<TRequestType, TResponseType> : GrpcCall() {
+    var lastResponse: TResponseType? = null
+}
 
-    /**
-     * Executes the GrpcCall. Sends the request and listens for updates.
-     */
-    fun startCall(): StreamingResponseGrpcCall<TRequestType, TReplyType> {
-        // TODO HOW TO IMPLEMENT THIS?
-        return this
+class AsyncGrpcObserver<TResponseType> : StreamObserver<TResponseType> {
+    var response: TResponseType? = null
+    var onResponseHandler: ((TResponseType) -> Unit)? = null
+    var onErrorHandler: ((Throwable) -> Unit)? = null
+    var onFinishHandler: (() -> Unit)? = null
+
+    @Suppress("TooGenericExceptionCaught") // executed code could throw any exception
+    override fun onNext(value: TResponseType) {
+        this.response = value
+        try {
+            onResponseHandler?.invoke(value)
+        } catch (e: Exception) {
+            VelocitasLogger.error("${e.message}")
+            onErrorHandler?.invoke(e)
+        }
     }
 
-    /**
-     * Sets the [handler] to whom the replies received by the stream are sent.
-     */
-    fun onData(handler: ((TReplyType) -> Unit)): StreamingResponseGrpcCall<TRequestType, TReplyType> {
-        readReactor.onDataHandler = handler
-        return this
+    override fun onError(t: Throwable) {
+        VelocitasLogger.error("${t.message}")
+        onErrorHandler?.invoke(t)
     }
 
-    /**
-     * Sets the [handler] which should be notified about the stream reaching it's end.
-     */
-    fun onFinish(handler: (() -> Unit)): StreamingResponseGrpcCall<TRequestType, TReplyType> {
-        readReactor.onFinishHandler = handler
-        return this
-    }
-
-    private class ReadReactor<TRequestType, TReplyType>(
-        private val parent: StreamingResponseGrpcCall<TRequestType, TReplyType>,
-    ) : StreamObserver<TReplyType> {
-        var reply: TReplyType? = null
-        var onDataHandler: ((TReplyType) -> Unit)? = null
-        var onFinishHandler: (() -> Unit)? = null
-
-        @Suppress("TooGenericExceptionCaught") // executed code could throw any exception
-        override fun onNext(value: TReplyType) {
-            this.reply = value
-            try {
-                onDataHandler?.invoke(value)
-            } catch (e: Exception) {
-                VelocitasLogger.error("${e.message}")
-            }
-        }
-
-        override fun onError(t: Throwable) {
-            VelocitasLogger.error("${t.message}")
-        }
-
-        override fun onCompleted() {
-            onFinishHandler?.invoke()
-            parent.isComplete = true
-        }
+    override fun onCompleted() {
+        onFinishHandler?.invoke()
     }
 }

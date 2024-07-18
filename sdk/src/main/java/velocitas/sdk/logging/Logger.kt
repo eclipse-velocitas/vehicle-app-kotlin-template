@@ -54,7 +54,10 @@ object VelocitasLogger {
      * Logs a [message] with debug level and uses the variadic list of [arguments] to replace them within the provided
      * message.
      */
-    fun debug(message: String, vararg arguments: Any?) {
+    fun debug(
+        message: String,
+        vararg arguments: Any?,
+    ) {
         val formattedMsg = message.format(arguments)
         impl.debug(formattedMsg)
     }
@@ -63,17 +66,27 @@ object VelocitasLogger {
      * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
      * message.
      */
-    fun info(message: String, vararg arguments: Any?) {
+    fun info(
+        message: String,
+        vararg arguments: Any?,
+    ) {
         val formattedMsg = message.format(arguments)
         impl.info(formattedMsg)
     }
 
     /**
-     * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
+     * Logs a [message] with warn level and uses the variadic list of [arguments] to replace them within the provided
      * message.
      */
-    fun warn(message: String, vararg arguments: Any?) {
-        val formattedMsg = message.format(arguments)
+    fun warn(
+        message: String,
+        throwable: Throwable? = null,
+        vararg arguments: Any?,
+    ) {
+        var formattedMsg = message.format(arguments)
+        if (throwable != null) {
+            formattedMsg += ": ${System.lineSeparator()} ${throwable.message}"
+        }
         impl.warn(formattedMsg)
     }
 
@@ -81,8 +94,37 @@ object VelocitasLogger {
      * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
      * message.
      */
-    fun error(message: String, vararg arguments: Any?) {
-        val formattedMsg = message.format(arguments)
+    fun warn(
+        message: String,
+        vararg arguments: Any?,
+    ) {
+        warn(message, null, arguments)
+    }
+
+    /**
+     * Logs a [message] with error level and uses the variadic list of [arguments] to replace them within the provided
+     * message.
+     */
+    fun error(
+        message: String,
+        vararg arguments: Any?,
+    ) {
+        error(message, null, arguments)
+    }
+
+    /**
+     * Logs a [message] with error level and uses the variadic list of [arguments] to replace them within the provided
+     * message.
+     */
+    fun error(
+        message: String,
+        throwable: Throwable? = null,
+        vararg arguments: Any?,
+    ) {
+        var formattedMsg = message.format(arguments)
+        if (throwable != null) {
+            formattedMsg += ": ${System.lineSeparator()} ${throwable.message}"
+        }
         impl.error(formattedMsg)
     }
 
@@ -119,7 +161,10 @@ class ConsoleLogger : Logger {
         System.err.flush()
     }
 
-    private fun format(level: String, msg: String): String {
+    private fun format(
+        level: String,
+        msg: String,
+    ): String {
         return "${Date()}, $level: $msg"
     }
 }
