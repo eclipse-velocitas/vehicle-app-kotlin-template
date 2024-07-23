@@ -24,7 +24,7 @@ import velocitas.sdk.parser.SimpleUrlParser
  */
 class NativeMiddleware : Middleware(TYPE_ID) {
 
-    override fun getServiceLocation(serviceName: String): String {
+    override fun findServiceLocation(serviceName: String): String {
         val envVarName = getServiceEnvVarName(serviceName)
         val envVar = System.getenv(envVarName) ?: ""
 

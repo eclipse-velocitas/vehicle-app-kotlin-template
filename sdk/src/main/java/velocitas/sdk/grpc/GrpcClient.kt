@@ -26,7 +26,7 @@ open class GrpcClient {
     private val recurringJob: RecurringJob
     private val activeCalls = mutableListOf<GrpcCall>()
 
-    val numActiveCalls: Int
+    val activeCallsCount: Int
         get() {
             return activeCalls.size
         }

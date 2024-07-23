@@ -31,7 +31,7 @@ class GrpcClientTest : BehaviorSpec({
 
             then("There should be one active call") {
                 eventually(100.milliseconds) {
-                    grpcClient.numActiveCalls shouldBe 1
+                    grpcClient.activeCallsCount shouldBe 1
                 }
             }
         }
@@ -42,7 +42,7 @@ class GrpcClientTest : BehaviorSpec({
 
             then("There should be two active calls") {
                 eventually(100.milliseconds) {
-                    grpcClient.numActiveCalls shouldBe 2
+                    grpcClient.activeCallsCount shouldBe 2
                 }
             }
 
@@ -51,7 +51,7 @@ class GrpcClientTest : BehaviorSpec({
 
                 then("It should be pruned from the active calls") {
                     eventually(100.milliseconds) {
-                        grpcClient.numActiveCalls shouldBe 1
+                        grpcClient.activeCallsCount shouldBe 1
                     }
                 }
             }
