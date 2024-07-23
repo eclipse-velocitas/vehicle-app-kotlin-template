@@ -27,8 +27,8 @@ class NativeMiddlewareTest : BehaviorSpec({
     context("Resolving the ServiceLocation") {
         withEnvironment("SDV_TESTSERVICE_ADDRESS", "localhost:12345") {
             `when`("Trying to resolve a well-defined service") {
-                val lcServiceLocation = classUnderTest.getServiceLocation("testservice")
-                val ucServiceLocation = classUnderTest.getServiceLocation("TESTSERVICE")
+                val lcServiceLocation = classUnderTest.findServiceLocation("testservice")
+                val ucServiceLocation = classUnderTest.findServiceLocation("TESTSERVICE")
 
                 then("It should resolve the correct host address, independent of the casing") {
                     lcServiceLocation shouldBe "localhost:12345"
@@ -38,8 +38,8 @@ class NativeMiddlewareTest : BehaviorSpec({
         }
 
         `when`("Trying to resolve the default service for mqtt") {
-            val lcServiceLocation = classUnderTest.getServiceLocation("mqtt")
-            val ucServiceLocation = classUnderTest.getServiceLocation("MQTT")
+            val lcServiceLocation = classUnderTest.findServiceLocation("mqtt")
+            val ucServiceLocation = classUnderTest.findServiceLocation("MQTT")
             then("It should resolve the correct host address, independent of the casing") {
                 lcServiceLocation shouldBe "localhost:1883"
                 lcServiceLocation shouldBe ucServiceLocation
@@ -47,8 +47,8 @@ class NativeMiddlewareTest : BehaviorSpec({
         }
 
         `when`("Trying to resolve the default service for vehicledatabroker") {
-            val lcServiceLocation = classUnderTest.getServiceLocation("vehicledatabroker")
-            val ucServiceLocation = classUnderTest.getServiceLocation("VEHICLEDATABROKER")
+            val lcServiceLocation = classUnderTest.findServiceLocation("vehicledatabroker")
+            val ucServiceLocation = classUnderTest.findServiceLocation("VEHICLEDATABROKER")
             then("It should resolve the correct host address, independent of the casing") {
                 lcServiceLocation shouldBe "localhost:55555"
                 lcServiceLocation shouldBe ucServiceLocation
@@ -57,7 +57,7 @@ class NativeMiddlewareTest : BehaviorSpec({
 
         `when`("Trying to resolve a Service defined by envVar with pure address") {
             withEnvironment(key = "SDV_SOMESERVICE_ADDRESS", value = "some-service-address") {
-                val serviceLocation = classUnderTest.getServiceLocation("someservice")
+                val serviceLocation = classUnderTest.findServiceLocation("someservice")
 
                 then("It should resolve to the content of the envVar") {
                     serviceLocation shouldBe "some-service-address"
@@ -67,7 +67,7 @@ class NativeMiddlewareTest : BehaviorSpec({
 
         `when`("Trying to resolve a Service defined by envVar with URL") {
             withEnvironment(key = "SDV_SOMESERVICE_ADDRESS", value = "scheme://some-host:port/path") {
-                val serviceLocation = classUnderTest.getServiceLocation("someservice")
+                val serviceLocation = classUnderTest.findServiceLocation("someservice")
 
                 then("It should resolve to the netLocation of the URL") {
                     serviceLocation shouldBe "some-host:port"
@@ -77,7 +77,7 @@ class NativeMiddlewareTest : BehaviorSpec({
 
         `when`("Trying to resolve an unknown service") {
             val result = runCatching {
-                classUnderTest.getServiceLocation("unknownService")
+                classUnderTest.findServiceLocation("unknownService")
             }
             then("It should throw an Exception") {
                 result.isFailure shouldBe true
