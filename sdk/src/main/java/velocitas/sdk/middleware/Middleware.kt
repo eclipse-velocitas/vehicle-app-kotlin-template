@@ -68,12 +68,14 @@ abstract class Middleware protected constructor(
         return metadata
     }
 
+    @Suppress("MoveVariableDeclarationIntoWhen")
     companion object : NoArgumentSingletonHolder<Middleware>({
         val envVar = System.getenv(TYPE_DEFINING_ENV_VAR_NAME) ?: ""
         val middlewareType = envVar.lowercase().trim()
         when (middlewareType) {
             EMPTY_STRING,
-            NativeMiddleware.TYPE_ID -> {
+            NativeMiddleware.TYPE_ID,
+            -> {
                 NativeMiddleware()
             }
 
