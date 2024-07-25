@@ -16,39 +16,15 @@
 
 package velocitas.sdk.logging
 
-import java.util.Date
-
 /**
- * A generic logger interface. Can be used to switch the underlying logging strategy of the VelocitasLogger.
- */
-interface Logger {
-    /**
-     * Log a [message] with info level.
-     */
-    fun info(message: String)
-
-    /**
-     * Log a [message] with warn level.
-     */
-    fun warn(message: String)
-
-    /**
-     * Log a [message] with error level.
-     */
-    fun error(message: String)
-
-    /**
-     * Log a [message] with debug level.
-     */
-    fun debug(message: String)
-}
-
-/**
- * Component used for Logging. The underlying strategy how to log can be switched using the [setLoggerImplementation]
+ * Component used for Logging. The underlying strategy how to log can be changed by calling the [loggingStrategy]
  * method.
  */
-object VelocitasLogger {
-    private var impl: Logger = ConsoleLogger()
+object Logger {
+    /**
+     * Changes the underlying strategy how to logging strategy.
+     */
+    var loggingStrategy: LoggingStrategy = ConsoleLoggingStrategy()
 
     /**
      * Logs a [message] with debug level and uses the variadic list of [arguments] to replace them within the provided
@@ -59,7 +35,7 @@ object VelocitasLogger {
         vararg arguments: Any?,
     ) {
         val formattedMsg = message.format(arguments)
-        impl.debug(formattedMsg)
+        loggingStrategy.debug(formattedMsg)
     }
 
     /**
@@ -71,7 +47,7 @@ object VelocitasLogger {
         vararg arguments: Any?,
     ) {
         val formattedMsg = message.format(arguments)
-        impl.info(formattedMsg)
+        loggingStrategy.info(formattedMsg)
     }
 
     /**
@@ -87,7 +63,7 @@ object VelocitasLogger {
         if (throwable != null) {
             formattedMsg += ": ${System.lineSeparator()} ${throwable.message}"
         }
-        impl.warn(formattedMsg)
+        loggingStrategy.warn(formattedMsg)
     }
 
     /**
@@ -125,46 +101,6 @@ object VelocitasLogger {
         if (throwable != null) {
             formattedMsg += ": ${System.lineSeparator()} ${throwable.message}"
         }
-        impl.error(formattedMsg)
-    }
-
-    /**
-     * Switches the underlying strategy how to log messages.
-     */
-    fun setLoggerImplementation(impl: Logger) {
-        VelocitasLogger.impl = impl
-    }
-}
-
-class ConsoleLogger : Logger {
-    override fun debug(message: String) {
-        val formattedMsg = format("DEBUG", message)
-        println(formattedMsg)
-        System.out.flush()
-    }
-
-    override fun info(message: String) {
-        val formattedMsg = format("INFO", message)
-        println(formattedMsg)
-        System.out.flush()
-    }
-
-    override fun warn(message: String) {
-        val formattedMsg = format("WARN", message)
-        println(formattedMsg)
-        System.out.flush()
-    }
-
-    override fun error(message: String) {
-        val formattedMsg = format("ERROR", message)
-        System.err.println(formattedMsg)
-        System.err.flush()
-    }
-
-    private fun format(
-        level: String,
-        msg: String,
-    ): String {
-        return "${Date()}, $level: $msg"
+        loggingStrategy.error(formattedMsg)
     }
 }

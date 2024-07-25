@@ -16,7 +16,7 @@
 
 package velocitas.sdk.middleware
 
-import velocitas.sdk.logging.VelocitasLogger
+import velocitas.sdk.logging.Logger
 import velocitas.sdk.parser.SimpleUrlParser
 
 /**
@@ -38,7 +38,7 @@ class NativeMiddleware : Middleware(TYPE_ID) {
 
         val defaultServiceAddress = getDefaultLocation(serviceName)
         if (defaultServiceAddress?.isNotEmpty() == true) {
-            VelocitasLogger.warn(
+            Logger.warn(
                 "Env variable '$envVarName' defining location of " +
                     "service '$serviceName' not properly set. Taking default: '$serviceAddress'",
             )
@@ -47,7 +47,7 @@ class NativeMiddleware : Middleware(TYPE_ID) {
 
         val errorMessage = "Env variable '$envVarName' defining location of " +
             "service '$serviceName' not set. Please define!"
-        VelocitasLogger.error(errorMessage)
+        Logger.error(errorMessage)
         throw IllegalStateException(errorMessage)
     }
 

@@ -36,7 +36,7 @@ class MiddlewareFactory {
     }
 
     companion object {
-        private const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE"
+        const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE"
 
         private const val EMPTY_STRING = ""
     }

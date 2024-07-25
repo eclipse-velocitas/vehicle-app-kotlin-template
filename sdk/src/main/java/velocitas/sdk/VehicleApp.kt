@@ -16,8 +16,7 @@
 
 package velocitas.sdk
 
-import velocitas.sdk.logging.VelocitasLogger
-import velocitas.sdk.middleware.Middleware
+import velocitas.sdk.logging.Logger
 import velocitas.sdk.middleware.MiddlewareFactory
 
 /**
@@ -31,8 +30,7 @@ abstract class VehicleApp {
      * Runs the Vehicle App.
      */
     fun run() {
-
-        VelocitasLogger.info("Running App...")
+        Logger.info("Running App...")
         middleware.start()
         middleware.waitUntilReady()
 
@@ -43,7 +41,7 @@ abstract class VehicleApp {
      * Stops the Vehicle App
      */
     fun stop() {
-        VelocitasLogger.info("Stopping App...")
+        Logger.info("Stopping App...")
 
         onStop()
 
