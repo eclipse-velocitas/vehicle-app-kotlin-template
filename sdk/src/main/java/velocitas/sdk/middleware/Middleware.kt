@@ -16,10 +16,6 @@
 
 package velocitas.sdk.middleware
 
-import velocitas.sdk.NoArgumentSingletonHolder
-import velocitas.sdk.middleware.Middleware.Companion.EMPTY_STRING
-import velocitas.sdk.middleware.Middleware.Companion.TYPE_DEFINING_ENV_VAR_NAME
-
 abstract class Middleware protected constructor(
     /**
      * The type identifier of the concrete middleware implementation.
@@ -66,30 +62,5 @@ abstract class Middleware protected constructor(
      */
     open fun getMetadata(serviceName: String): Metadata {
         return metadata
-    }
-
-    @Suppress("MoveVariableDeclarationIntoWhen")
-    companion object : NoArgumentSingletonHolder<Middleware>({
-        val envVar = System.getenv(TYPE_DEFINING_ENV_VAR_NAME) ?: ""
-        val middlewareType = envVar.lowercase().trim()
-        when (middlewareType) {
-            EMPTY_STRING,
-            NativeMiddleware.TYPE_ID,
-            -> {
-                NativeMiddleware()
-            }
-
-            else -> {
-                error("Unknown middleware type '$middlewareType'")
-            }
-        }
-    }) {
-        /**
-         * Defines the name of the environment variable used to determine the middleware type to
-         * be used.
-         */
-        const val TYPE_DEFINING_ENV_VAR_NAME = "SDV_MIDDLEWARE_TYPE"
-
-        private const val EMPTY_STRING = ""
     }
 }

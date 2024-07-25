@@ -25,6 +25,7 @@ import velocitas.sdk.ThreadPool
 open class GrpcClient {
     private val recurringJob: RecurringJob
     private val activeCalls = mutableListOf<GrpcCall>()
+    private val threadPool = ThreadPool()
 
     val activeCallsCount: Int
         get() {
@@ -35,7 +36,7 @@ open class GrpcClient {
         recurringJob = RecurringJob {
             pruneCompletedRequests()
         }
-        ThreadPool.getInstance().enqueue(recurringJob)
+        threadPool.enqueue(recurringJob)
     }
 
     /**

@@ -75,6 +75,4 @@ class ThreadPool(var numWorkerThreads: Int) {
             }
         }
     }
-
-    companion object : NoArgumentSingletonHolder<ThreadPool>(::ThreadPool)
 }

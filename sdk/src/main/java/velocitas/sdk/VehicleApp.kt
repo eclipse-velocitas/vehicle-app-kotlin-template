@@ -18,18 +18,23 @@ package velocitas.sdk
 
 import velocitas.sdk.logging.VelocitasLogger
 import velocitas.sdk.middleware.Middleware
+import velocitas.sdk.middleware.MiddlewareFactory
 
 /**
  * Base class for all vehicle apps which manages an app's lifecycle.
  */
 abstract class VehicleApp {
+    private val middlewareFactory = MiddlewareFactory()
+    private val middleware = middlewareFactory.create()
+
     /**
      * Runs the Vehicle App.
      */
     fun run() {
+
         VelocitasLogger.info("Running App...")
-        Middleware.getInstance().start()
-        Middleware.getInstance().waitUntilReady()
+        middleware.start()
+        middleware.waitUntilReady()
 
         onStart()
     }
@@ -42,7 +47,7 @@ abstract class VehicleApp {
 
         onStop()
 
-        Middleware.getInstance().stop()
+        middleware.stop()
     }
 
     /**
