@@ -28,7 +28,7 @@ package org.eclipse.velocitas.sdk.parser
  * ("login") part of the URL.
  * Other elements to be added as needed ...
  */
-class SimpleUrlParser {
+class UrlParser {
     private val schemePartStart = "//"
     private val simplifiedSchemeSeparator = "://"
 

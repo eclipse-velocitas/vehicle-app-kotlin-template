@@ -17,7 +17,7 @@
 package org.eclipse.velocitas.sdk.middleware
 
 import org.eclipse.velocitas.sdk.logging.Logger
-import org.eclipse.velocitas.sdk.parser.SimpleUrlParser
+import org.eclipse.velocitas.sdk.parser.UrlParser
 
 /**
  * Native Middleware implementation.
@@ -28,8 +28,8 @@ class NativeMiddleware : Middleware(TYPE_ID) {
         val envVarName = getServiceEnvVarName(serviceName)
         val envVar = System.getenv(envVarName) ?: ""
 
-        val simpleUrlParser = SimpleUrlParser()
-        val result: SimpleUrlParser.Result = simpleUrlParser.parse(envVar)
+        val urlParser = UrlParser()
+        val result: UrlParser.Result = urlParser.parse(envVar)
         val serviceAddress = result.netLocation
 
         if (serviceAddress.isNotEmpty()) {
@@ -63,8 +63,8 @@ class NativeMiddleware : Middleware(TYPE_ID) {
             val filteredService =
                 DEFAULT_LOCATIONS.entries.find { it.key == serviceName.lowercase() }
             if (filteredService != null) {
-                val simpleUrlParser = SimpleUrlParser()
-                val result = simpleUrlParser.parse(filteredService.value)
+                val urlParser = UrlParser()
+                val result = urlParser.parse(filteredService.value)
                 return result.netLocation
             }
             return null

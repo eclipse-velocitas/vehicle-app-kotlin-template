@@ -19,16 +19,16 @@ package org.eclipse.velocitas.sdk.parser
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 
-class SimpleUrlParserTest : BehaviorSpec({
+class UrlParserTest : BehaviorSpec({
     context("Parsing NetLocation and Scheme") {
-        val simpleUrlParser = SimpleUrlParser()
+        val urlParser = UrlParser()
 
         `when`("Parsing 'http://username:password@hostname:portnumber/path'") {
             val scheme = "http"
             val netLocation = "username:password@hostname:portnumber"
             val url = "$scheme://$netLocation/path"
 
-            val result = simpleUrlParser.parse(url)
+            val result = urlParser.parse(url)
 
             then("The scheme should be resolved to 'http'") {
                 result.scheme shouldBe scheme
@@ -43,7 +43,7 @@ class SimpleUrlParserTest : BehaviorSpec({
             val netLocation = "somehost:1234"
             val url = "$scheme://$netLocation/somePath"
 
-            val result = simpleUrlParser.parse(url)
+            val result = urlParser.parse(url)
 
             then("The scheme should be resolved to 'http'") {
                 result.scheme shouldBe scheme
@@ -58,7 +58,7 @@ class SimpleUrlParserTest : BehaviorSpec({
             val netLocation = "username:password@hostname:portnumber"
             val url = "$scheme://$netLocation/path"
 
-            val result = simpleUrlParser.parse(url)
+            val result = urlParser.parse(url)
 
             then("The scheme should be resolved in lowercase 'username:password@hostname:portnumber'") {
                 scheme.lowercase() shouldBe result.scheme
@@ -68,7 +68,7 @@ class SimpleUrlParserTest : BehaviorSpec({
         `when`("Parsing 'mailto:receipient@somewhere.io'") {
             val url = "mailto:receipient@somewhere.io"
 
-            val result = simpleUrlParser.parse(url)
+            val result = urlParser.parse(url)
 
             then("The scheme will be resolved to an empty String") {
                 result.scheme shouldBe ""
@@ -82,7 +82,7 @@ class SimpleUrlParserTest : BehaviorSpec({
             val netLocation = "127.0.0.1:42"
             val url = "//$netLocation/somePath"
 
-            val result = simpleUrlParser.parse(url)
+            val result = urlParser.parse(url)
 
             then("The scheme should be resolved to an empty String") {
                 result.scheme shouldBe ""
@@ -96,7 +96,7 @@ class SimpleUrlParserTest : BehaviorSpec({
             val netLocation = "localhost:123"
             val url = "$netLocation/somePath"
 
-            val result = simpleUrlParser.parse(url)
+            val result = urlParser.parse(url)
 
             then("The scheme should be resolved to an empty String") {
                 result.scheme shouldBe ""
