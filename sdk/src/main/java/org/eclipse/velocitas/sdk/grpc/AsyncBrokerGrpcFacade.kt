@@ -23,6 +23,8 @@ import org.eclipse.kuksa.proto.v2.KuksaValV2.*
 import org.eclipse.kuksa.proto.v2.Types.Datapoint
 import org.eclipse.kuksa.proto.v2.Types.SignalID
 import org.eclipse.kuksa.proto.v2.VALGrpc
+import org.eclipse.velocitas.sdk.Status
+import org.eclipse.velocitas.sdk.concurrency.AsyncResult
 
 /**
  * AsyncBrokerGrpcFacade provides asynchronous communication against the VehicleDataBroker.
@@ -34,18 +36,14 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
 
     /**
      * Gets the latest value of a [signalId].
-     * If the request is successfully executed the response will be delivered to the [responseHandler],
-     * if an error occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      *
      * The server might respond with the following GRPC error codes:
      *    NOT_FOUND if the requested signal doesn't exist
      *    PERMISSION_DENIED if access is denied
      */
-    fun getValue(
-        signalId: SignalID,
-        responseHandler: ((GetValueResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    fun getValue(signalId: SignalID): AsyncResult<GetValueResponse> {
         val request = GetValueRequest.newBuilder()
             .setSignalId(signalId)
             .build()
@@ -53,37 +51,37 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
         val callData = SingleResponseGrpcCall<GetValueRequest, GetValueResponse>(request)
         addActiveCall(callData)
 
+        val asyncResult = AsyncResult<GetValueResponse>()
         val responseObserver = AsyncGrpcObserver<GetValueResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.getValue(request, responseObserver)
+
+        return asyncResult
     }
 
     /**
      * Gets the latest values of a set of [signalIds]. The returned list of data points has the same order as the list
      * of the request.
-     * If the request is successfully executed the response will be delivered to the [responseHandler],
-     * if an error occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      *
      * The server might respond with the following GRPC error codes:
      *    NOT_FOUND if any of the requested signals doesn't exist.
      *    PERMISSION_DENIED if access is denied for any of the requested signals.
      */
-    fun getValues(
-        signalIds: List<SignalID>,
-        responseHandler: ((GetValuesResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    fun getValues(signalIds: List<SignalID>): AsyncResult<GetValuesResponse> {
         val request = GetValuesRequest.newBuilder()
             .addAllSignalIds(signalIds)
             .build()
@@ -91,37 +89,37 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
         val callData = SingleResponseGrpcCall<GetValuesRequest, GetValuesResponse>(request)
         addActiveCall(callData)
 
+        val asyncResult = AsyncResult<GetValuesResponse>()
         val responseObserver = AsyncGrpcObserver<GetValuesResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.getValues(request, responseObserver)
+
+        return asyncResult
     }
 
     /**
      * Lists the values of [signalIds] matching the request and responds with a list of signal values. Only values of
      * signals that the user is allowed to read are included (everything else is ignored).
-     * If the request is successfully executed the response will be delivered to the [responseHandler], if an error
-     * occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      *
      * The server might respond with the following GRPC error codes:
      *    NOT_FOUND if any of the requested signals doesn't exist.
      *    PERMISSION_DENIED if access is denied for any of the requested signals.
      */
-    fun listValues(
-        signalIds: List<SignalID>,
-        responseHandler: ((ListValuesResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    fun listValues(signalIds: List<SignalID>): AsyncResult<ListValuesResponse> {
         val request = ListValuesRequest.newBuilder()
             .addAllSignalIds(signalIds)
             .build()
@@ -129,20 +127,24 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
         val callData = StreamingResponseGrpcCall<ListValuesRequest, ListValuesResponse>(request)
         addActiveCall(callData)
 
+        val asyncResult = AsyncResult<ListValuesResponse>()
         val responseObserver = AsyncGrpcObserver<ListValuesResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.listValues(request, responseObserver)
+
+        return asyncResult
     }
 
     /**
@@ -191,8 +193,8 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
 
     /**
      * Actuates a single actuator with the specified [signalId].
-     * If the request is successfully executed the response will be delivered to the [responseHandler], if an error
-     * occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      *
      * The server might respond with the following GRPC error codes:
      *    NOT_FOUND if the actuator does not exist.
@@ -202,38 +204,40 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
      *        - if the data type used in the request does not match the data type of the addressed signal
      *        - if the requested value is not accepted, e.g. if sending an unsupported enum value
      */
-    fun actuate(
-        signalId: SignalID,
-        responseHandler: ((ActuateResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    fun actuate(signalId: SignalID): AsyncResult<ActuateResponse> {
         val request = ActuateRequest.newBuilder()
             .setSignalId(signalId)
             .build()
 
         val callData = SingleResponseGrpcCall<ActuateRequest, ActuateResponse>(request)
+        addActiveCall(callData)
+
+        val asyncResult = AsyncResult<ActuateResponse>()
         val responseObserver = AsyncGrpcObserver<ActuateResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.actuate(request, responseObserver)
+
+        return asyncResult
     }
 
     /**
      * Actuates simultaneously multiple actuators with the specified [signalIds].
      * If any error occurs, the entire operation will be aborted and no single actuator value will be forwarded to the
      * provider.
-     * If the request is successfully executed the response will be delivered to the [responseHandler], if an error
-     * occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      *
      * The server might respond with the following GRPC error codes:
      *     NOT_FOUND if any of the actuators are non-existent.
@@ -244,11 +248,7 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
      *         - if the requested value is not accepted, e.g. if sending an unsupported enum value
      *
      */
-    fun batchActuate(
-        signalIds: List<SignalID>,
-        responseHandler: ((BatchActuateResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    fun batchActuate(signalIds: List<SignalID>): AsyncResult<BatchActuateResponse> {
         val requestBuilder = BatchActuateRequest.newBuilder()
 
         signalIds.forEach { signalId ->
@@ -261,28 +261,32 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
         val callData = SingleResponseGrpcCall<BatchActuateRequest, BatchActuateResponse>(request)
         addActiveCall(callData)
 
+        val asyncResult = AsyncResult<BatchActuateResponse>()
         val responseObserver = AsyncGrpcObserver<BatchActuateResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.batchActuate(request, responseObserver)
+
+        return asyncResult
     }
 
     /**
      * Lists metadata of signals matching the request.
      * If any error occurs, the entire operation will be aborted and no single actuator value will be forwarded to the
      * provider.
-     * If the request is successfully executed the response will be delivered to the [responseHandler], if an error
-     * occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      *
      * The server might respond with the following GRPC error codes:
      *     NOT_FOUND if the specified root branch does not exist.
@@ -290,9 +294,7 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
     fun listMetadata(
         root: String,
         filter: String,
-        responseHandler: ((ListMetadataResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    ): AsyncResult<ListMetadataResponse> {
         val request = ListMetadataRequest.newBuilder()
             .setRoot(root)
             .setFilter(filter)
@@ -301,26 +303,30 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
         val callData = SingleResponseGrpcCall<ListMetadataRequest, ListMetadataResponse>(request)
         addActiveCall(callData)
 
+        val asyncResult = AsyncResult<ListMetadataResponse>()
         val responseObserver = AsyncGrpcObserver<ListMetadataResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.listMetadata(request, responseObserver)
+
+        return asyncResult
     }
 
     /**
      * Publishes a signal value. Used for low frequency signals (e.g. attributes).
-     * If the request is successfully executed the response will be delivered to the [responseHandler], if an error
-     * occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      *
      * The server might respond with the following GRPC error codes:
      *     NOT_FOUND if any of the signals are non-existent.
@@ -334,9 +340,7 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
     fun publishValue(
         signalId: SignalID,
         datapoint: Datapoint,
-        responseHandler: ((PublishValueResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    ): AsyncResult<PublishValueResponse> {
         val request = PublishValueRequest.newBuilder()
             .setSignalId(signalId)
             .setDataPoint(datapoint)
@@ -345,20 +349,24 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
         val callData = SingleResponseGrpcCall<PublishValueRequest, PublishValueResponse>(request)
         addActiveCall(callData)
 
+        val asyncResult = AsyncResult<PublishValueResponse>()
         val responseObserver = AsyncGrpcObserver<PublishValueResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.publishValue(request, responseObserver)
+
+        return asyncResult
     }
 
     /**
@@ -399,31 +407,32 @@ class AsyncBrokerGrpcFacade(private val channel: Channel) : GrpcClient() {
 
     /**
      * Gets the server information.
-     * If the request is successfully executed the responses will be delivered to the [responseHandler], if an error
-     * occurs it will be delivered to the [errorHandler].
+     * The response is delivered as an AsyncResult which allows the response to be consumed asynchronously using an
+     * [AsyncResult.resultCallback] or synchronously by using [AsyncResult.await].
      */
-    fun getServerInfo(
-        responseHandler: ((GetServerInfoResponse) -> Unit),
-        errorHandler: ((Throwable) -> Unit),
-    ) {
+    fun getServerInfo(): AsyncResult<GetServerInfoResponse> {
         val request = GetServerInfoRequest.newBuilder().build()
 
         val callData = SingleResponseGrpcCall<GetServerInfoRequest, GetServerInfoResponse>(request)
         addActiveCall(callData)
 
+        val asyncResult = AsyncResult<GetServerInfoResponse>()
         val responseObserver = AsyncGrpcObserver<GetServerInfoResponse>()
             .apply {
                 onResponseHandler = { response ->
-                    responseHandler(response)
+                    asyncResult.insertResult(response)
                 }
                 onFinishHandler = {
                     callData.isComplete = true
                 }
                 onErrorHandler = { throwable ->
-                    errorHandler(throwable)
+                    val error = Status(throwable.message ?: "")
+                    asyncResult.insertError(error)
                 }
             }
 
         asyncStub.getServerInfo(request, responseObserver)
+
+        return asyncResult
     }
 }
