@@ -104,26 +104,5 @@ class JobTest : BehaviorSpec({
                 isExecuted shouldBe true
             }
         }
-
-        `when`("Cancel is called") {
-            val result = runCatching {
-                recurringJob.cancel()
-            }
-            then("No Exception should be thrown") {
-                result.isFailure shouldBe false
-                result.exceptionOrNull() shouldBe null
-            }
-            then("shallRecur should return false") {
-                recurringJob.shallRecur shouldBe false
-            }
-
-            and("When the job is executed afterwards") {
-                recurringJob.run()
-
-                then("The passed function should not be executed") {
-                    isExecuted shouldBe false
-                }
-            }
-        }
     }
 })

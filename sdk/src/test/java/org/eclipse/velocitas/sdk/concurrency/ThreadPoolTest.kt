@@ -90,7 +90,7 @@ class ThreadPoolTest : BehaviorSpec({
             }
 
             and("After cancellation of the task") {
-                recurringJob.cancel()
+                classUnderTest.cancelRecurringJob(recurringJob)
 
                 then("It should no longer be executed") {
                     val currentCounter = counter

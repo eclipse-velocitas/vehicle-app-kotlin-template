@@ -16,8 +16,6 @@
 
 package org.eclipse.velocitas.sdk.concurrency
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 interface ExecutorJob : Runnable {
     /**
      * Indicates if this job shall recur after its execution. If the job shall recur the corresponding
@@ -43,7 +41,6 @@ open class Job(
      */
     private val function: (() -> Unit),
 ) : ExecutorJob {
-
     override val recurringOptions: RecurringOptions? = null
 
     @Synchronized
@@ -61,26 +58,8 @@ open class Job(
 }
 
 /**
- * A recurring job. Will be executed continuously until cancel is called or the [ThreadPool] is stopped. Once the
+ * A recurring job. Will be executed continuously until [ThreadPool.cancelRecurringJob] is called. Once the
  * Job finished successfully it will be added again to the working queue. This means the time between two consecutive
- * executions of the recurring job might vary.
+ * executions of the recurring job might vary. Should be used together with the [ThreadPool].
  */
-open class RecurringJob(override val recurringOptions: RecurringOptions, function: (() -> Unit)) : Job(function) {
-    private val isCancelled: AtomicBoolean = AtomicBoolean(false)
-
-    override fun run() {
-        if (!isCancelled.get()) {
-            super.run()
-        }
-    }
-
-    override val shallRecur: Boolean
-        get() = !isCancelled.get()
-
-    /**
-     * Prevents further execution of the function once called.
-     */
-    fun cancel() {
-        isCancelled.set(true)
-    }
-}
+open class RecurringJob(override val recurringOptions: RecurringOptions, function: (() -> Unit)) : Job(function)

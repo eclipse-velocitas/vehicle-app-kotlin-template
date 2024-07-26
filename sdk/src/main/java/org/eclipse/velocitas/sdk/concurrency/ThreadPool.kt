@@ -16,6 +16,7 @@
 
 package org.eclipse.velocitas.sdk.concurrency
 
+import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
 private const val DEFAULT_NUMBER_WORKER_THREADS = 2
@@ -31,6 +32,8 @@ class ThreadPool(var numWorkerThreads: Int) {
             removeOnCancelPolicy = true
         }
 
+    private val recurringJobs = mutableMapOf<ExecutorJob, ScheduledFuture<*>>()
+
     private var isShutdown: Boolean = false
 
     /**
@@ -44,15 +47,26 @@ class ThreadPool(var numWorkerThreads: Int) {
 
         if (job.shallRecur) {
             val recurringOptions = job.recurringOptions!!
-            scheduledThreadPoolExecutor.scheduleAtFixedRate(
+            val scheduledFuture = scheduledThreadPoolExecutor.scheduleAtFixedRate(
                 job,
                 recurringOptions.initialDelay,
                 recurringOptions.period,
                 recurringOptions.unit,
             )
+
+            recurringJobs[job] = scheduledFuture
         } else {
             scheduledThreadPoolExecutor.submit(job)
         }
+    }
+
+    fun cancelRecurringJob(executorJob: ExecutorJob): Boolean {
+        check(executorJob.shallRecur) {
+            "Not a recurring Job: $executorJob"
+        }
+
+        val scheduledFuture = recurringJobs.remove(executorJob)
+        return scheduledFuture?.cancel(true) == true
     }
 
     /**
