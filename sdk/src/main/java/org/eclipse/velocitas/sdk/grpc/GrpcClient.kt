@@ -16,34 +16,23 @@
 
 package org.eclipse.velocitas.sdk.grpc
 
-import org.eclipse.velocitas.sdk.RecurringJob
-import org.eclipse.velocitas.sdk.ThreadPool
-
 /**
  * GrpcClient used to communicate with a GrpcService. It tracks the number of active GrpcCalls.
  */
-open class GrpcClient {
-    private val recurringJob: RecurringJob
+abstract class GrpcClient {
     private val activeCalls = mutableListOf<GrpcCall>()
-    private val threadPool = ThreadPool()
 
     val activeCallsCount: Int
         get() {
             return activeCalls.size
         }
 
-    init {
-        recurringJob = RecurringJob {
-            pruneCompletedRequests()
-        }
-        threadPool.enqueue(recurringJob)
-    }
-
     /**
      * Adds an active GrpcCall.
      */
     @Synchronized
     fun addActiveCall(call: GrpcCall) {
+        pruneCompletedRequests()
         activeCalls.add(call)
     }
 

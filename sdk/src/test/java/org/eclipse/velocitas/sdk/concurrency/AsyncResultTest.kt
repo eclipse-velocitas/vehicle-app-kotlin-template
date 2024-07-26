@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.velocitas.sdk
+package org.eclipse.velocitas.sdk.concurrency
 
 import io.kotest.assertions.nondeterministic.eventually
 import io.kotest.core.spec.style.BehaviorSpec

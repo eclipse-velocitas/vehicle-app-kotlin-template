@@ -14,11 +14,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.velocitas.sdk
+package org.eclipse.velocitas.sdk.concurrency
 
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 class JobTest : BehaviorSpec({
@@ -28,7 +29,7 @@ class JobTest : BehaviorSpec({
         var isExecuted = false
         val job = Job { isExecuted = true }
         `when`("Checking it's recur state") {
-            val recurState = job.shallRecur()
+            val recurState = job.shallRecur
 
             then("It should return false") {
                 recurState shouldBe false
@@ -39,7 +40,7 @@ class JobTest : BehaviorSpec({
         }
 
         `when`("execute is called") {
-            job.execute()
+            job.run()
 
             then("The passed function is executed") {
                 isExecuted shouldBe true
@@ -67,7 +68,7 @@ class JobTest : BehaviorSpec({
         }
 
         thread {
-            job.execute()
+            job.run()
         }
 
         `when`("Waiting for termination") {
@@ -80,10 +81,12 @@ class JobTest : BehaviorSpec({
     }
 
     given("A short running RecurringJob") {
+        val recurringOptions = RecurringOptions(0L, 100L, TimeUnit.MILLISECONDS)
+
         var isExecuted = false
-        val recurringJob = RecurringJob { isExecuted = true }
+        val recurringJob = RecurringJob(recurringOptions) { isExecuted = true }
         `when`("Checking the state of shallRecur") {
-            val shallRecur = recurringJob.shallRecur()
+            val shallRecur = recurringJob.shallRecur
 
             then("It should return true") {
                 shallRecur shouldBe true
@@ -95,7 +98,7 @@ class JobTest : BehaviorSpec({
         }
 
         `when`("execute is called") {
-            recurringJob.execute()
+            recurringJob.run()
 
             then("The passed function is executed") {
                 isExecuted shouldBe true
@@ -111,11 +114,11 @@ class JobTest : BehaviorSpec({
                 result.exceptionOrNull() shouldBe null
             }
             then("shallRecur should return false") {
-                recurringJob.shallRecur() shouldBe false
+                recurringJob.shallRecur shouldBe false
             }
 
             and("When the job is executed afterwards") {
-                recurringJob.execute()
+                recurringJob.run()
 
                 then("The passed function should not be executed") {
                     isExecuted shouldBe false

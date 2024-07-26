@@ -14,32 +14,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.velocitas.sdk
+package org.eclipse.velocitas.sdk.concurrency
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-interface ExecutorJob {
+interface ExecutorJob : Runnable {
+    /**
+     * Indicates if this job shall recur after its execution. If the job shall recur the corresponding
+     * [recurringOptions] need to be set.
+     */
+    val shallRecur: Boolean
+        get() = recurringOptions != null
 
     /**
-     * Execute the job.
+     * The recurringOptions to use when executing the task multiple times. It allows a more fine granular adjustment
+     * of initial delays or execution periods between two consecutive executions.
      */
-    fun execute()
-
-    /**
-     * Indicates if this job shall recur after its execution.
-     *
-     * @return true - recur this job
-     * @return false - don't recur
-     */
-    fun shallRecur(): Boolean {
-        return false
-    }
+    val recurringOptions: RecurringOptions?
 }
 
 /**
  * A non-recurring job. Will be executed once and afterwards removed from the JobQueue. Should be used together with
  * the [ThreadPool].
- *
  */
 open class Job(
     /**
@@ -48,13 +44,15 @@ open class Job(
     private val function: (() -> Unit),
 ) : ExecutorJob {
 
+    override val recurringOptions: RecurringOptions? = null
+
     @Synchronized
-    override fun execute() {
+    override fun run() {
         function()
     }
 
     /**
-     * Blocks other threads until [execute] finished successful.
+     * Blocks other threads until [run] finished successful.
      */
     @Synchronized
     fun waitForTermination() {
@@ -67,18 +65,17 @@ open class Job(
  * Job finished successfully it will be added again to the working queue. This means the time between two consecutive
  * executions of the recurring job might vary.
  */
-open class RecurringJob(function: (() -> Unit)) : Job(function) {
+open class RecurringJob(override val recurringOptions: RecurringOptions, function: (() -> Unit)) : Job(function) {
     private val isCancelled: AtomicBoolean = AtomicBoolean(false)
 
-    override fun execute() {
+    override fun run() {
         if (!isCancelled.get()) {
-            super.execute()
+            super.run()
         }
     }
 
-    override fun shallRecur(): Boolean {
-        return !isCancelled.get()
-    }
+    override val shallRecur: Boolean
+        get() = !isCancelled.get()
 
     /**
      * Prevents further execution of the function once called.

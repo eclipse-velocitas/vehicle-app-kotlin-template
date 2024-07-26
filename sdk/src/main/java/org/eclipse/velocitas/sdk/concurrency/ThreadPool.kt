@@ -14,15 +14,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.velocitas.sdk
+package org.eclipse.velocitas.sdk.concurrency
 
-import org.eclipse.velocitas.sdk.logging.Logger
-import java.util.Vector
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.concurrent.thread
+import java.util.concurrent.ScheduledThreadPoolExecutor
 
-private const val MAX_NUMBER_PENDING_JOBS = 1_000
 private const val DEFAULT_NUMBER_WORKER_THREADS = 2
 
 /**
@@ -31,48 +26,40 @@ private const val DEFAULT_NUMBER_WORKER_THREADS = 2
 class ThreadPool(var numWorkerThreads: Int) {
     constructor() : this(DEFAULT_NUMBER_WORKER_THREADS)
 
-    private val workerThreads = Vector<Thread>()
-    private val jobs = ArrayBlockingQueue<ExecutorJob>(MAX_NUMBER_PENDING_JOBS)
-    private val isRunning: AtomicBoolean = AtomicBoolean(true)
-
-    init {
-        repeat(numWorkerThreads) {
-            val thread = thread {
-                threadLoop()
-            }
-
-            workerThreads.add(thread)
+    private val scheduledThreadPoolExecutor = ScheduledThreadPoolExecutor(numWorkerThreads)
+        .apply {
+            removeOnCancelPolicy = true
         }
-    }
+
+    private var isShutdown: Boolean = false
 
     /**
      * Enqueue a new [job] to be processed by one of the worker threads. No more than [numWorkerThreads] jobs are
      * processed at the same time.
      */
     fun enqueue(job: ExecutorJob) {
-        jobs.add(job)
+        check(!isShutdown) {
+            "Cannot enqueue new jobs. ThreadPool has already been shutdown"
+        }
+
+        if (job.shallRecur) {
+            val recurringOptions = job.recurringOptions!!
+            scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                job,
+                recurringOptions.initialDelay,
+                recurringOptions.period,
+                recurringOptions.unit,
+            )
+        } else {
+            scheduledThreadPoolExecutor.submit(job)
+        }
     }
 
     /**
      * The ThreadPool will finish it's currently running jobs and no longer process new jobs.
      */
     fun shutdown() {
-        isRunning.set(false)
-    }
-
-    @Suppress("TooGenericExceptionCaught") // executed code could throw any exception
-    private fun threadLoop() {
-        while (isRunning.get()) {
-            val polledJob = jobs.poll() ?: continue
-
-            try {
-                polledJob.execute()
-                if (polledJob.shallRecur()) {
-                    enqueue(polledJob)
-                }
-            } catch (e: Exception) {
-                Logger.error("Uncaught Exception in job execution: ${e.message}")
-            }
-        }
+        isShutdown = true
+        scheduledThreadPoolExecutor.shutdown()
     }
 }

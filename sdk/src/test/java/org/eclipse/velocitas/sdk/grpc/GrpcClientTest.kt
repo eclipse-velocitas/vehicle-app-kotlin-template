@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class GrpcClientTest : BehaviorSpec({
     given("A GrpcClient") {
-        val grpcClient = GrpcClient()
+        val grpcClient = object : GrpcClient() { }
 
         `when`("An active call is added") {
             val call = SingleResponseGrpcCall<TestRequest, TestResponse>(TestRequest)
@@ -49,9 +49,14 @@ class GrpcClientTest : BehaviorSpec({
             and("When one of the active calls finishes") {
                 call.isComplete = true
 
-                then("It should be pruned from the active calls") {
-                    eventually(100.milliseconds) {
-                        grpcClient.activeCallsCount shouldBe 1
+                and("Another task is added") {
+                    val anotherCall = SingleResponseGrpcCall<TestRequest, TestResponse>(TestRequest)
+                    grpcClient.addActiveCall(anotherCall)
+
+                    then("The finished call should be removed from the active calls") {
+                        eventually(100.milliseconds) {
+                            grpcClient.activeCallsCount shouldBe 2
+                        }
                     }
                 }
             }

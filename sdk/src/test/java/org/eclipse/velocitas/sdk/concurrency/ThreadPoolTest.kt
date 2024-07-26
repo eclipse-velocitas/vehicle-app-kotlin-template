@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.velocitas.sdk
+package org.eclipse.velocitas.sdk.concurrency
 
 import io.kotest.assertions.nondeterministic.continually
 import io.kotest.assertions.nondeterministic.eventually
@@ -30,6 +30,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+
+private val testRecurringOptions = RecurringOptions(0L, 100L, TimeUnit.MILLISECONDS)
 
 class ThreadPoolTest : BehaviorSpec({
     isolationMode = IsolationMode.InstancePerTest
@@ -74,14 +77,14 @@ class ThreadPoolTest : BehaviorSpec({
     context("Enqueueing a job") {
         `when`("A RecurringJob is enqueued") {
             var counter = 0
-            val recurringJob = RecurringJob {
+            val recurringJob = RecurringJob(testRecurringOptions) {
                 counter++
             }
 
             classUnderTest.enqueue(recurringJob)
 
             then("It should be executed multiple times") {
-                eventually(50.milliseconds) {
+                eventually(1.seconds) {
                     counter shouldBeGreaterThan 1
                 }
             }
@@ -217,7 +220,9 @@ open class FakeJob : ExecutorJob {
 
     private var countDownLatch: CountDownLatch? = null
 
-    override fun execute() {
+    override val recurringOptions: RecurringOptions? = null
+
+    override fun run() {
         countDownLatch = CountDownLatch(1)
         synchronized(executionMutex) {
             atomicExecutionState.set(State.Executing)
@@ -282,13 +287,23 @@ enum class State {
 }
 
 class FakeRecurringJob : FakeJob() {
-    private val doRecur = AtomicBoolean(true)
+    override val recurringOptions: RecurringOptions = testRecurringOptions
 
-    override fun shallRecur(): Boolean {
-        return doRecur.get()
+    private val isCancelled: AtomicBoolean = AtomicBoolean(false)
+
+    override fun run() {
+        if (!isCancelled.get()) {
+            super.run()
+        }
     }
 
+    override val shallRecur: Boolean
+        get() = !isCancelled.get()
+
+    /**
+     * Prevents further execution of the function once called.
+     */
     fun cancel() {
-        doRecur.set(false)
+        isCancelled.set(true)
     }
 }

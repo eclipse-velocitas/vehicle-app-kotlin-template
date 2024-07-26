@@ -14,8 +14,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.velocitas.sdk
+package org.eclipse.velocitas.sdk.concurrency
 
+import org.eclipse.velocitas.sdk.AsyncException
+import org.eclipse.velocitas.sdk.Status
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 

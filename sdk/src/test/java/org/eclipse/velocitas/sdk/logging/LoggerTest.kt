@@ -14,12 +14,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.eclipse.velocitas.sdk
+package org.eclipse.velocitas.sdk.logging
 
 import io.kotest.core.config.LogLevel
 import io.kotest.core.spec.style.BehaviorSpec
-import org.eclipse.velocitas.sdk.logging.Logger
-import org.eclipse.velocitas.sdk.logging.LoggingStrategy
 
 class LoggerTest : BehaviorSpec({
     Logger.loggingStrategy = StringLoggingStrategy
