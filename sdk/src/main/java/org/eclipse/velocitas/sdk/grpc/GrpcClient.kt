@@ -17,32 +17,6 @@
 package org.eclipse.velocitas.sdk.grpc
 
 /**
- * GrpcClient used to communicate with a GrpcService. It tracks the number of active GrpcCalls.
+ * Marker Interface for GrpcClients, which are used to communicate with a GrpcService.
  */
-abstract class GrpcClient {
-    private val activeCalls = mutableListOf<GrpcCall>()
-
-    val activeCallsCount: Int
-        get() {
-            return activeCalls.size
-        }
-
-    /**
-     * Adds an active GrpcCall.
-     */
-    @Synchronized
-    fun addActiveCall(call: GrpcCall) {
-        pruneCompletedRequests()
-        activeCalls.add(call)
-    }
-
-    @Synchronized
-    private fun pruneCompletedRequests() {
-        val iterator = activeCalls.iterator()
-        iterator.forEach { grpcCall ->
-            if (grpcCall.isComplete) {
-                iterator.remove()
-            }
-        }
-    }
-}
+interface GrpcClient
