@@ -16,14 +16,31 @@
 
 package org.eclipse.velocitas.sdk.grpc
 
-import com.google.common.util.concurrent.ListenableFuture
 import io.grpc.Channel
-import io.grpc.Context
-import io.grpc.stub.StreamObserver
-import org.eclipse.kuksa.proto.v2.KuksaValV2.*
+import kotlinx.coroutines.flow.Flow
+import org.eclipse.kuksa.proto.v2.KuksaValV2.ActuateResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.BatchActuateResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.GetServerInfoResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.GetValueResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.GetValuesResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.ListMetadataResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.ListValuesResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.OpenProviderStreamRequest
+import org.eclipse.kuksa.proto.v2.KuksaValV2.OpenProviderStreamResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.PublishValueResponse
+import org.eclipse.kuksa.proto.v2.KuksaValV2.SubscribeResponse
 import org.eclipse.kuksa.proto.v2.Types.Datapoint
 import org.eclipse.kuksa.proto.v2.Types.SignalID
-import org.eclipse.kuksa.proto.v2.VALGrpc
+import org.eclipse.kuksa.proto.v2.VALGrpcKt
+import org.eclipse.kuksa.proto.v2.actuateRequest
+import org.eclipse.kuksa.proto.v2.batchActuateRequest
+import org.eclipse.kuksa.proto.v2.getServerInfoRequest
+import org.eclipse.kuksa.proto.v2.getValueRequest
+import org.eclipse.kuksa.proto.v2.getValuesRequest
+import org.eclipse.kuksa.proto.v2.listMetadataRequest
+import org.eclipse.kuksa.proto.v2.listValuesRequest
+import org.eclipse.kuksa.proto.v2.publishValueRequest
+import org.eclipse.kuksa.proto.v2.subscribeRequest
 
 /**
  * AsyncBrokerGrpcFacade provides asynchronous communication against the VehicleDataBroker.
@@ -31,11 +48,8 @@ import org.eclipse.kuksa.proto.v2.VALGrpc
  * https://github.com/eclipse-kuksa/kuksa-databroker/tree/main/proto/kuksa/val/v2.
  */
 class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
-    private val asyncStub: VALGrpc.VALStub
-        get() = VALGrpc.newStub(channel)
-
-    private val futureStub: VALGrpc.VALFutureStub
-        get() = VALGrpc.newFutureStub(channel)
+    private val coroutineStub: VALGrpcKt.VALCoroutineStub
+        get() = VALGrpcKt.VALCoroutineStub(channel)
 
     /**
      * Gets the latest value of a [signalId].
@@ -44,12 +58,11 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      *    NOT_FOUND if the requested signal doesn't exist
      *    PERMISSION_DENIED if access is denied
      */
-    fun getValue(signalId: SignalID): ListenableFuture<GetValueResponse> {
-        val request = GetValueRequest.newBuilder()
-            .setSignalId(signalId)
-            .build()
-
-        return futureStub.getValue(request)
+    suspend fun getValue(signalId: SignalID): GetValueResponse {
+        val request = getValueRequest {
+            this.signalId = signalId
+        }
+        return coroutineStub.getValue(request)
     }
 
     /**
@@ -60,12 +73,12 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      *    NOT_FOUND if any of the requested signals doesn't exist.
      *    PERMISSION_DENIED if access is denied for any of the requested signals.
      */
-    fun getValues(signalIds: List<SignalID>): ListenableFuture<GetValuesResponse> {
-        val request = GetValuesRequest.newBuilder()
-            .addAllSignalIds(signalIds)
-            .build()
+    suspend fun getValues(signalIds: List<SignalID>): GetValuesResponse {
+        val request = getValuesRequest {
+            this.signalIds.addAll(signalIds)
+        }
 
-        return futureStub.getValues(request)
+        return coroutineStub.getValues(request)
     }
 
     /**
@@ -76,17 +89,16 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      *    NOT_FOUND if any of the requested signals doesn't exist.
      *    PERMISSION_DENIED if access is denied for any of the requested signals.
      */
-    fun listValues(signalIds: List<SignalID>): ListenableFuture<ListValuesResponse> {
-        val request = ListValuesRequest.newBuilder()
-            .addAllSignalIds(signalIds)
-            .build()
+    suspend fun listValues(signalIds: List<SignalID>): ListValuesResponse {
+        val request = listValuesRequest {
+            this.signalIds.addAll(signalIds)
+        }
 
-        return futureStub.listValues(request)
+        return coroutineStub.listValues(request)
     }
 
     /**
      * Subscribes to a set of [signalIds].
-     * Returns a cancellableContext to cancel the active subscriptions.
      *
      * The server might respond with the following GRPC error codes:
      *    NOT_FOUND if any of the signals are non-existent.
@@ -94,19 +106,12 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      */
     fun subscribe(
         signalIds: List<SignalID>,
-        streamObserver: StreamObserver<SubscribeResponse>,
-    ): Context.CancellableContext {
-        val request = SubscribeRequest.newBuilder()
-            .addAllSignalIds(signalIds)
-            .build()
-
-        val currentContext = Context.current()
-        val cancellableContext = currentContext.withCancellation()
-        cancellableContext.run {
-            asyncStub.subscribe(request, streamObserver)
+    ): Flow<SubscribeResponse> {
+        val request = subscribeRequest {
+            this.signalIds.addAll(signalIds)
         }
 
-        return cancellableContext
+        return coroutineStub.subscribe(request)
     }
 
     /**
@@ -120,12 +125,12 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      *        - if the data type used in the request does not match the data type of the addressed signal
      *        - if the requested value is not accepted, e.g. if sending an unsupported enum value
      */
-    fun actuate(signalId: SignalID): ListenableFuture<ActuateResponse> {
-        val request = ActuateRequest.newBuilder()
-            .setSignalId(signalId)
-            .build()
+    suspend fun actuate(signalId: SignalID): ActuateResponse {
+        val request = actuateRequest {
+            this.signalId = signalId
+        }
 
-        return futureStub.actuate(request)
+        return coroutineStub.actuate(request)
     }
 
     /**
@@ -142,15 +147,17 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      *         - if the requested value is not accepted, e.g. if sending an unsupported enum value
      *
      */
-    fun batchActuate(signalIds: List<SignalID>): ListenableFuture<BatchActuateResponse> {
-        val requestBuilder = BatchActuateRequest.newBuilder()
-        signalIds.forEach { signalId ->
-            val actuateRequest = ActuateRequest.newBuilder().setSignalId(signalId)
-            requestBuilder.addActuateRequests(actuateRequest)
+    suspend fun batchActuate(signalIds: List<SignalID>): BatchActuateResponse {
+        val request = batchActuateRequest {
+            signalIds.forEach { signalId ->
+                val actuateRequest = actuateRequest {
+                    this.signalId = signalId
+                }
+                this.actuateRequests.add(actuateRequest)
+            }
         }
-        val request = requestBuilder.build()
 
-        return futureStub.batchActuate(request)
+        return coroutineStub.batchActuate(request)
     }
 
     /**
@@ -161,16 +168,16 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      * The server might respond with the following GRPC error codes:
      *     NOT_FOUND if the specified root branch does not exist.
      */
-    fun listMetadata(
+    suspend fun listMetadata(
         root: String,
         filter: String,
-    ): ListenableFuture<ListMetadataResponse> {
-        val request = ListMetadataRequest.newBuilder()
-            .setRoot(root)
-            .setFilter(filter)
-            .build()
+    ): ListMetadataResponse {
+        val request = listMetadataRequest {
+            this.root = root
+            this.filter = filter
+        }
 
-        return futureStub.listMetadata(request)
+        return coroutineStub.listMetadata(request)
     }
 
     /**
@@ -185,16 +192,16 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      *        - if the data type used in the request does not match the data type of the addressed signal
      *        - if the published value is not accepted e.g. if sending an unsupported enum value
      */
-    fun publishValue(
+    suspend fun publishValue(
         signalId: SignalID,
         datapoint: Datapoint,
-    ): ListenableFuture<PublishValueResponse> {
-        val request = PublishValueRequest.newBuilder()
-            .setSignalId(signalId)
-            .setDataPoint(datapoint)
-            .build()
+    ): PublishValueResponse {
+        val request = publishValueRequest {
+            this.signalId = signalId
+            this.dataPoint = datapoint
+        }
 
-        return futureStub.publishValue(request)
+        return coroutineStub.publishValue(request)
     }
 
     /**
@@ -207,17 +214,17 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
      *  Errors are communicated as messages in the stream.
      */
     fun openProviderStream(
-        streamObserver: StreamObserver<OpenProviderStreamResponse>,
-    ): StreamObserver<OpenProviderStreamRequest> {
-        return asyncStub.openProviderStream(streamObserver)
+        streamRequestFlow: Flow<OpenProviderStreamRequest>,
+    ): Flow<OpenProviderStreamResponse> {
+        return coroutineStub.openProviderStream(streamRequestFlow)
     }
 
     /**
      * Gets the server information.
      */
-    fun getServerInfo(): ListenableFuture<GetServerInfoResponse> {
-        val request = GetServerInfoRequest.newBuilder().build()
+    suspend fun getServerInfo(): GetServerInfoResponse {
+        val request = getServerInfoRequest { }
 
-        return futureStub.getServerInfo(request)
+        return coroutineStub.getServerInfo(request)
     }
 }

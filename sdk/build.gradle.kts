@@ -14,12 +14,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import com.google.protobuf.gradle.id
-
 plugins {
     id("java-library")
-    alias(libs.plugins.jetbrains.kotlin.jvm)
-    id("com.google.protobuf") version "0.9.4"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.protobuf)
     ktlint
 }
 
@@ -30,23 +28,35 @@ java {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.25.1"
+        artifact = libs.protoc.asProvider().get().toString()
     }
     plugins {
-        id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.64.0"
+        create("java") {
+            artifact = libs.protoc.gen.grpc.java.get().toString()
         }
-        generateProtoTasks {
-            all().forEach {
-                it.builtins {
-                    named("java") {
-                        option("lite")
-                    }
+        create("grpc") {
+            artifact = libs.protoc.gen.grpc.java.get().toString()
+        }
+        create("grpckt") {
+            artifact = libs.protoc.gen.grpc.kotlin.get().toString() + ":jdk8@jar"
+        }
+    }
+    generateProtoTasks {
+        all().forEach {
+            it.builtins {
+                named("java") {
+                    option("lite")
                 }
-                it.plugins {
-                    create("grpc") {
-                        option("lite")
-                    }
+                create("kotlin") {
+                    option("lite")
+                }
+            }
+            it.plugins {
+                create("grpc") {
+                    option("lite")
+                }
+                create("grpckt") {
+                    option("lite")
                 }
             }
         }
@@ -62,8 +72,11 @@ tasks.withType<Test>().configureEach {
 dependencies {
     implementation(libs.grpc.okhttp)
     implementation(libs.grpc.protobuf.lite)
+
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.grpc.stub)
-    compileOnly(libs.annotations.api)
+    implementation(libs.grpc.kotlin.stub)
+    implementation(libs.protobuf.kotlin.lite)
 
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
