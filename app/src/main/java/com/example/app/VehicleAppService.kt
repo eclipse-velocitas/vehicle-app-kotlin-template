@@ -14,27 +14,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-pluginManagement {
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+package com.example.app
 
-rootProject.name = "vehicle-app-kotlin-template"
-include(":sdk")
-include(":app")
+import androidx.car.app.CarAppService
+import androidx.car.app.Session
+import androidx.car.app.validation.HostValidator
+
+/**
+ * The base class for implementing a car app that runs in the car
+ *
+ * @see CarAppService
+ */
+class VehicleAppService : CarAppService() {
+    override fun createHostValidator(): HostValidator {
+        return HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
+    }
+
+    override fun onCreateSession(): Session {
+        return VehicleAppSession()
+    }
+}

@@ -22,3 +22,4 @@ trim_trailing_whitespace = false
 ktlint_code_style = ktlint_official
 ktlint_standard_no-wildcard-imports = disabled
 ktlint_standard_annotation = disabled # false positive with @JvmOverloads and default constructor
+ij_kotlin_imports_layout = java.**, javax.**, kotlin.**, kotlinx.**, android, androidx, *, ^

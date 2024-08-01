@@ -49,3 +49,7 @@ formatting:
     active: true
   NoWildcardImports:
     active: false
+  ImportOrdering:
+    active: true
+    autoCorrect: true
+    layout: java.**,javax.**,kotlin.**,kotlinx.**,android,androidx,*,^

@@ -1,13 +1,11 @@
 [versions]
 agp = "8.5.1"
-annotationsApi = "6.0.53"
+automotiveVersion = "1.4.0"
 detektFormatting = "1.23.6"
+fragmentKtx = "1.8.2"
 kotlin = "2.0.0"
-coreKtx = "1.13.1"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-appcompat = "1.7.0"
-material = "1.12.0"
 junitJupiter = "5.10.1"
 kotestRunnerJunit5 = "5.9.1"
 jvmTarget = "17"
@@ -16,18 +14,19 @@ grpcJava = "1.64.0"
 grpcKotlin = "1.4.1"
 coroutines = "1.8.1"
 protobuf = "3.25.3"
+junit = "4.13.2"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-annotations-api = { module = "org.apache.tomcat:annotations-api", version.ref = "annotationsApi" }
+androidx-car-app = { module = "androidx.car.app:app", version.ref = "automotiveVersion" }
+androidx-car-app-automotive = { module = "androidx.car.app:app-automotive", version.ref = "automotiveVersion" }
+androidx-car-app-testing = { module = "androidx.car.app:app-testing", version.ref = "automotiveVersion" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 grpc-okhttp = { module = "io.grpc:grpc-okhttp", version.ref = "grpcJava" }
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpcJava" }
 grpc-protobuf-lite = { module = "io.grpc:grpc-protobuf-lite", version.ref = "grpcJava" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiter" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiter" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotestRunnerJunit5" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormatting" }
@@ -37,6 +36,7 @@ protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protob
 protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
 protoc-gen-grpc-java = { group = "io.grpc", name = "protoc-gen-grpc-java", version.ref = "grpcJava" }
 protoc-gen-grpc-kotlin = { group = "io.grpc", name = "protoc-gen-grpc-kotlin", version.ref = "grpcKotlin" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
