@@ -19,11 +19,6 @@
     },
     "ghcr.io/devcontainers/features/common-utils:2.4.5": {}
   },
-  "extensions": [
-    "gabrielbb.vscode-lombok",
-    "vscjava.vscode-java-pack",
-    "esbenp.prettier-vscode"
-  ],
   "postCreateCommand": "bash .devcontainer/scripts/postStartCommand.sh",
   "customizations": {
     "vscode": {
