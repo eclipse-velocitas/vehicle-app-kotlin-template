@@ -32,6 +32,8 @@ stdout
 /.idea/vcs.xml
 misc.xml
 deploymentTargetDropDown.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/emulatorDisplays.xml
 render.experimental.xml
 
 # Keystore files
