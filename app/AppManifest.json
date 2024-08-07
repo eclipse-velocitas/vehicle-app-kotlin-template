@@ -15,14 +15,6 @@
               "path": "Vehicle.Cabin.Door.Row1.DriverSide.IsLocked",
               "access": "write"
             },
-            {
-              "path": "Vehicle.Cabin.HVAC.Fronthousing.AchmcAcOnStatusS",
-              "access": "read"
-            },
-            {
-              "path": "Vehicle.Cabin.HVAC.Fronthousing.AcbCloseButton",
-              "access": "write"
-            }
           ]
         }
       }
@@ -31,13 +23,6 @@
       "type": "grpc-interface",
       "config": {
         "src": "src/proto/door.proto",
-        "provided": {}
-      }
-    },
-    {
-      "type": "grpc-interface",
-      "config": {
-        "src": "src/proto/fronthousing.proto",
         "provided": {}
       }
     },
