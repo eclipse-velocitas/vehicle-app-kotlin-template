@@ -70,12 +70,13 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+
     implementation(libs.grpc.okhttp)
     implementation(libs.grpc.protobuf.lite)
-
-    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.grpc.stub)
     implementation(libs.grpc.kotlin.stub)
+
     implementation(libs.protobuf.kotlin.lite)
 
     testImplementation(libs.junit.jupiter.api)

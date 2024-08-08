@@ -1,0 +1,40 @@
+/*
+ * Provides door control and status service, one atomic service for each door.
+ */
+syntax = "proto3";
+package door;
+service Door {
+  /* Unlock the door. */
+  rpc Unlock(UnlockRequest) returns (UnlockResponse);
+
+  /* Lock the door.  */
+  rpc Lock(LockRequest) returns (LockResponse);
+}
+
+message UnlockRequest {}
+
+message UnlockResponse {
+  BCMReturnCode code = 1;
+}
+
+message LockRequest {}
+
+message LockResponse {
+  BCMReturnCode code = 1;
+}
+
+/*
+ * The Body Atomic Services API call returned information
+ */
+enum BCMReturnCode {
+  BCM_RETURN_CODE_UNSPECIFIED = 0;
+  /*
+   * Success
+   */
+  BCM_RETURN_CODE_SUCCESS = 1;
+
+  /*
+   * Execution failed
+   */
+  BCM_RETURN_CODE_FAIL = 2;
+}

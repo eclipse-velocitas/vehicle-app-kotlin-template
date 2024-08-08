@@ -16,8 +16,8 @@
 
 package org.eclipse.velocitas.sdk.grpc
 
-import io.grpc.Channel
 import kotlinx.coroutines.flow.Flow
+import io.grpc.Channel
 import org.eclipse.kuksa.proto.v2.KuksaValV2.ActuateResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.BatchActuateResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.GetServerInfoResponse
