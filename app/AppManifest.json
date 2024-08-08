@@ -14,7 +14,7 @@
             {
               "path": "Vehicle.Cabin.Door.Row1.DriverSide.IsLocked",
               "access": "write"
-            },
+            }
           ]
         }
       }
