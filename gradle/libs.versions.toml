@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.1"
+agp = "8.5.2"
 automotiveVersion = "1.4.0"
 detektFormatting = "1.23.6"
 fragmentKtx = "1.8.2"
