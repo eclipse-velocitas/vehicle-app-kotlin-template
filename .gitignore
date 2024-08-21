@@ -22,18 +22,11 @@ output.json
 stdout
 
 # IntelliJ
+# Some .idea files will be force added e.g. the copyright profiles
+/.idea
 *.iml
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-/.idea/vcs.xml
 misc.xml
 deploymentTargetDropDown.xml
-/.idea/deploymentTargetSelector.xml
-/.idea/emulatorDisplays.xml
 render.experimental.xml
 
 # Keystore files
