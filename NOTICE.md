@@ -1,4 +1,4 @@
-# Notices for Eclipse Kuksa
+# Notices for Eclipse Velocitas
 
 This content is produced and maintained by the Eclipse Velocitas project.
 
