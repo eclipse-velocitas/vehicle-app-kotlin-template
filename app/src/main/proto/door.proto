@@ -2,7 +2,11 @@
  * Provides door control and status service, one atomic service for each door.
  */
 syntax = "proto3";
+
 package door;
+
+option java_outer_classname = "DoorService";
+
 service Door {
   /* Unlock the door. */
   rpc Unlock(UnlockRequest) returns (UnlockResponse);
