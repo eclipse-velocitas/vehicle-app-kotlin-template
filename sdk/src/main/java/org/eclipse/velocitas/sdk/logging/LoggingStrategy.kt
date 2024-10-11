@@ -21,22 +21,27 @@ package org.eclipse.velocitas.sdk.logging
  */
 interface LoggingStrategy {
     /**
-     * Log a [message] with info level.
+     * Log a [message] with the specified [tag] on info level.
      */
-    fun info(message: String)
+    fun info(tag: String, message: String)
 
     /**
-     * Log a [message] with warn level.
+     * Log a [message] with the specified [tag] on warn level.
      */
-    fun warn(message: String)
+    fun warn(tag: String, message: String)
 
     /**
-     * Log a [message] with error level.
+     * Log a [message] with the specified [tag] on error level.
      */
-    fun error(message: String)
+    fun error(tag: String, message: String)
 
     /**
-     * Log a [message] with debug level.
+     * Log a [message] with the specified [tag] on debug level.
      */
-    fun debug(message: String)
+    fun debug(tag: String, message: String)
+
+    /**
+     * Log a [message] with the specified [tag] on verbose level.
+     */
+    fun verbose(tag: String, message: String)
 }

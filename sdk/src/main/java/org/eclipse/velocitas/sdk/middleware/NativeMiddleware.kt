@@ -19,6 +19,8 @@ package org.eclipse.velocitas.sdk.middleware
 import org.eclipse.velocitas.sdk.logging.Logger
 import org.eclipse.velocitas.sdk.parser.UrlParser
 
+private const val TAG = "NativeMiddleware"
+
 /**
  * Native Middleware implementation.
  */
@@ -39,6 +41,7 @@ class NativeMiddleware : Middleware(TYPE_ID) {
         val defaultServiceAddress = getDefaultLocation(serviceName)
         if (defaultServiceAddress?.isNotEmpty() == true) {
             Logger.warn(
+                TAG,
                 "Env variable '$envVarName' defining location of " +
                     "service '$serviceName' not properly set. Taking default: '$serviceAddress'",
             )
@@ -47,7 +50,7 @@ class NativeMiddleware : Middleware(TYPE_ID) {
 
         val errorMessage = "Env variable '$envVarName' defining location of " +
             "service '$serviceName' not set. Please define!"
-        Logger.error(errorMessage)
+        Logger.error(TAG, errorMessage)
         throw IllegalStateException(errorMessage)
     }
 

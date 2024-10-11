@@ -19,6 +19,8 @@ package org.eclipse.velocitas.sdk
 import org.eclipse.velocitas.sdk.logging.Logger
 import org.eclipse.velocitas.sdk.middleware.MiddlewareFactory
 
+private const val TAG = "VehicleApplication"
+
 /**
  * Base class for all vehicle apps which manages an app's lifecycle.
  */
@@ -29,8 +31,8 @@ abstract class VehicleApp {
     /**
      * Runs the Vehicle App.
      */
-    fun run() {
-        Logger.info("Running App...")
+    fun start() {
+        Logger.info(TAG, "Running App...")
         middleware.start()
         middleware.waitUntilReady()
 
@@ -41,11 +43,11 @@ abstract class VehicleApp {
      * Stops the Vehicle App
      */
     fun stop() {
-        Logger.info("Stopping App...")
-
-        onStop()
+        Logger.info(TAG, "Stopping App...")
 
         middleware.stop()
+
+        onStop()
     }
 
     /**

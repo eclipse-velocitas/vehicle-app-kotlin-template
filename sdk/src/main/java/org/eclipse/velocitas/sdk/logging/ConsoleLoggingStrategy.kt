@@ -21,31 +21,37 @@ import java.util.Date
 /**
  * ConsoleLoggingStrategy logs the message to System.out and System.err depending on the log level.
  */
-class ConsoleLoggingStrategy : LoggingStrategy {
-    override fun debug(message: String) {
-        val formattedMsg = format("DEBUG", message)
+object ConsoleLoggingStrategy : LoggingStrategy {
+    override fun verbose(tag: String, message: String) {
+        val formattedMsg = format("VERBOSE", tag, message)
         println(formattedMsg)
     }
 
-    override fun info(message: String) {
-        val formattedMsg = format("INFO", message)
+    override fun debug(tag: String, message: String) {
+        val formattedMsg = format("DEBUG", tag, message)
         println(formattedMsg)
     }
 
-    override fun warn(message: String) {
-        val formattedMsg = format("WARN", message)
+    override fun info(tag: String, message: String) {
+        val formattedMsg = format("INFO", tag, message)
         println(formattedMsg)
     }
 
-    override fun error(message: String) {
-        val formattedMsg = format("ERROR", message)
+    override fun warn(tag: String, message: String) {
+        val formattedMsg = format("WARN", tag, message)
+        println(formattedMsg)
+    }
+
+    override fun error(tag: String, message: String) {
+        val formattedMsg = format("ERROR", tag, message)
         System.err.println(formattedMsg)
     }
 
     private fun format(
         level: String,
+        tag: String,
         msg: String,
     ): String {
-        return "${Date()}, $level: $msg"
+        return "${Date()} - $level - $tag: $msg"
     }
 }

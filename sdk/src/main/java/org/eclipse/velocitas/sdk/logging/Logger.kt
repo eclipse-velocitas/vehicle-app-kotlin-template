@@ -16,6 +16,8 @@
 
 package org.eclipse.velocitas.sdk.logging
 
+import org.eclipse.velocitas.sdk.logging.Logger.loggingStrategy
+
 /**
  * Component used for Logging. The underlying strategy how to log can be changed by calling the [loggingStrategy]
  * method.
@@ -24,83 +26,105 @@ object Logger {
     /**
      * Changes the underlying strategy how to logging strategy.
      */
-    var loggingStrategy: LoggingStrategy = ConsoleLoggingStrategy()
+    var loggingStrategy: LoggingStrategy = ConsoleLoggingStrategy
 
     /**
-     * Logs a [message] with debug level and uses the variadic list of [arguments] to replace them within the provided
-     * message.
+     * Logs a [message] with the specified [tag] on verbose level and uses the variadic list of [messageArgs]
+     * to replace them within the provided message.
+     */
+    fun verbose(
+        tag: String,
+        message: String,
+        vararg messageArgs: Any?,
+    ) {
+        val formattedMessage = message.format(messageArgs)
+        loggingStrategy.verbose(tag, formattedMessage)
+    }
+
+    /**
+     * Logs a [message] with the specified [tag] on debug level and uses the variadic list of [messageArgs]
+     * to replace them within the provided message.
      */
     fun debug(
+        tag: String,
         message: String,
-        vararg arguments: Any?,
+        vararg messageArgs: Any?,
     ) {
-        val formattedMsg = message.format(arguments)
-        loggingStrategy.debug(formattedMsg)
+        val formattedMsg = message.format(messageArgs)
+        loggingStrategy.debug(tag, formattedMsg)
     }
 
     /**
-     * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
-     * message.
+     * Logs a [message] with the specified [tag] on info level and uses the variadic list of [messageArgs]
+     * to replace them within the provided message.
      */
+
     fun info(
+        tag: String,
         message: String,
-        vararg arguments: Any?,
+        vararg messageArgs: Any?,
     ) {
-        val formattedMsg = message.format(arguments)
-        loggingStrategy.info(formattedMsg)
+        val formattedMsg = message.format(messageArgs)
+        loggingStrategy.info(tag, formattedMsg)
     }
 
     /**
-     * Logs a [message] with warn level and uses the variadic list of [arguments] to replace them within the provided
-     * message.
+     * Logs a [message] with the specified [tag] on warn level and uses the variadic list of [messageArgs]
+     * to replace them within the provided message.  A [throwable] can be provided as a cause for the warn
+     * behavior.
      */
     fun warn(
+        tag: String,
         message: String,
         throwable: Throwable? = null,
-        vararg arguments: Any?,
+        vararg messageArgs: Any?,
     ) {
-        var formattedMsg = message.format(arguments)
+        var formattedMsg = message.format(messageArgs)
         if (throwable != null) {
             formattedMsg += ": ${System.lineSeparator()} ${throwable.message}"
         }
-        loggingStrategy.warn(formattedMsg)
+        loggingStrategy.warn(tag, formattedMsg)
     }
 
     /**
-     * Logs a [message] with info level and uses the variadic list of [arguments] to replace them within the provided
-     * message.
+     * Logs a [message] with the specified [tag] on warn level and uses the variadic list of [messageArgs]
+     * to replace them within the provided message.
      */
     fun warn(
+        tag: String,
         message: String,
-        vararg arguments: Any?,
+        vararg messageArgs: Any?,
     ) {
-        warn(message, null, arguments)
+        warn(tag, message, null, messageArgs)
     }
 
     /**
-     * Logs a [message] with error level and uses the variadic list of [arguments] to replace them within the provided
-     * message.
+     * Logs a [message] with the specified [tag] on error level and uses the variadic list of [messageArgs]
+     * to replace them within the provided message.
      */
     fun error(
+        tag: String,
         message: String,
-        vararg arguments: Any?,
+        vararg messageArgs: Any?,
     ) {
-        error(message, null, arguments)
+        error(tag, message, null, messageArgs)
     }
 
     /**
-     * Logs a [message] with error level and uses the variadic list of [arguments] to replace them within the provided
-     * message.
+     * Logs a [message] with the specified [tag] on verbose level and uses the variadic list of [messageArgs]
+     * to replace them within the provided message. A [throwable] can be provided as a cause for the erroneous
+     * behavior.
      */
     fun error(
+        tag: String,
         message: String,
         throwable: Throwable? = null,
-        vararg arguments: Any?,
+        vararg messageArgs: Any?,
     ) {
-        var formattedMsg = message.format(arguments)
+        var formattedMsg = message.format(messageArgs)
         if (throwable != null) {
             formattedMsg += ": ${System.lineSeparator()} ${throwable.message}"
         }
-        loggingStrategy.error(formattedMsg)
+        loggingStrategy.error(tag, formattedMsg)
     }
 }

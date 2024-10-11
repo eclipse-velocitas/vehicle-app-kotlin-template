@@ -19,6 +19,8 @@ package org.eclipse.velocitas.sdk.logging
 import io.kotest.core.config.LogLevel
 import io.kotest.core.spec.style.BehaviorSpec
 
+private const val TAG = "LoggerTest"
+
 class LoggerTest : BehaviorSpec({
     Logger.loggingStrategy = StringLoggingStrategy
 
@@ -26,9 +28,19 @@ class LoggerTest : BehaviorSpec({
         val errorMessage = "Error: Some Error Occurred - Errorcode: "
         var counter = 0
 
+        `when`("Logging on Verbose Level") {
+            counter++
+            Logger.verbose(TAG, "$errorMessage ($counter)")
+
+            then("It should log the correct message on the correct level") {
+                StringLoggingStrategy.lastLevel = LogLevel.Trace
+                StringLoggingStrategy.lastMessage = "$errorMessage ($counter)"
+            }
+        }
+
         `when`("Logging on Debug Level") {
             counter++
-            Logger.debug("$errorMessage ($counter)")
+            Logger.debug(TAG, "$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Debug
@@ -38,7 +50,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Info Level") {
             counter++
-            Logger.info("$errorMessage ($counter)")
+            Logger.info(TAG, "$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Info
@@ -48,7 +60,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Warn Level") {
             counter++
-            Logger.warn("$errorMessage ($counter)")
+            Logger.warn(TAG, "$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Warn
@@ -59,7 +71,7 @@ class LoggerTest : BehaviorSpec({
         `when`("Logging on Error Level") {
             counter++
 
-            Logger.error("$errorMessage ($counter)")
+            Logger.error(TAG, "$errorMessage ($counter)")
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Error
@@ -72,9 +84,19 @@ class LoggerTest : BehaviorSpec({
         val errorMessage = "Error: Some Error Occurred"
         var counter = 0
 
+        `when`("Logging on Verbose Level") {
+            counter++
+            Logger.verbose(TAG, "$errorMessage (%s)", counter)
+
+            then("It should log the correct message on the correct level") {
+                StringLoggingStrategy.lastLevel = LogLevel.Trace
+                StringLoggingStrategy.lastMessage = "$errorMessage ($counter)"
+            }
+        }
+
         `when`("Logging on Debug Level") {
             counter++
-            Logger.debug("$errorMessage (%s)", counter)
+            Logger.debug(TAG, "$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Debug
@@ -84,7 +106,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Info Level") {
             counter++
-            Logger.info("$errorMessage (%s)", counter)
+            Logger.info(TAG, "$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Info
@@ -94,7 +116,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Warn Level") {
             counter++
-            Logger.warn("$errorMessage (%s)", counter)
+            Logger.warn(TAG, "$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Warn
@@ -104,7 +126,7 @@ class LoggerTest : BehaviorSpec({
 
         `when`("Logging on Error Level") {
             counter++
-            Logger.error("$errorMessage (%s)", counter)
+            Logger.error(TAG, "$errorMessage (%s)", counter)
 
             then("It should log the correct message on the correct level") {
                 StringLoggingStrategy.lastLevel = LogLevel.Error
@@ -117,24 +139,35 @@ class LoggerTest : BehaviorSpec({
 object StringLoggingStrategy : LoggingStrategy {
     var lastLevel: LogLevel? = null
     var lastMessage: String? = null
+    var lastTag: String? = null
 
-    override fun info(message: String) {
+    override fun info(tag: String, message: String) {
         lastLevel = LogLevel.Info
+        lastTag = tag
         lastMessage = message
     }
 
-    override fun warn(message: String) {
+    override fun warn(tag: String, message: String) {
         lastLevel = LogLevel.Warn
+        lastTag = tag
         lastMessage = message
     }
 
-    override fun error(message: String) {
+    override fun error(tag: String, message: String) {
         lastLevel = LogLevel.Error
+        lastTag = tag
         lastMessage = message
     }
 
-    override fun debug(message: String) {
+    override fun debug(tag: String, message: String) {
         lastLevel = LogLevel.Debug
+        lastTag = tag
+        lastMessage = message
+    }
+
+    override fun verbose(tag: String, message: String) {
+        lastLevel = LogLevel.Trace
+        lastTag = tag
         lastMessage = message
     }
 }
