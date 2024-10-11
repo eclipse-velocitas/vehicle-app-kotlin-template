@@ -17,14 +17,17 @@
 package org.eclipse.velocitas.sdk.grpc
 
 import kotlinx.coroutines.flow.Flow
-import io.grpc.Channel
+import io.grpc.ChannelCredentials
+import io.grpc.Grpc
+import io.grpc.InsecureChannelCredentials
+import io.grpc.ManagedChannel
+import org.eclipse.kuksa.proto.v2.KuksaValV2
 import org.eclipse.kuksa.proto.v2.KuksaValV2.ActuateResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.BatchActuateResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.GetServerInfoResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.GetValueResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.GetValuesResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.ListMetadataResponse
-import org.eclipse.kuksa.proto.v2.KuksaValV2.ListValuesResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.OpenProviderStreamRequest
 import org.eclipse.kuksa.proto.v2.KuksaValV2.OpenProviderStreamResponse
 import org.eclipse.kuksa.proto.v2.KuksaValV2.PublishValueResponse
@@ -38,18 +41,36 @@ import org.eclipse.kuksa.proto.v2.getServerInfoRequest
 import org.eclipse.kuksa.proto.v2.getValueRequest
 import org.eclipse.kuksa.proto.v2.getValuesRequest
 import org.eclipse.kuksa.proto.v2.listMetadataRequest
-import org.eclipse.kuksa.proto.v2.listValuesRequest
 import org.eclipse.kuksa.proto.v2.publishValueRequest
+import org.eclipse.kuksa.proto.v2.subscribeByIdRequest
 import org.eclipse.kuksa.proto.v2.subscribeRequest
+import org.eclipse.velocitas.sdk.logging.Logger
+
+private const val TAG = "CoroutineBrokerGrpcFacade"
 
 /**
- * AsyncBrokerGrpcFacade provides asynchronous communication against the VehicleDataBroker.
+ * CoroutineBrokerGrpcFacade provides synchronous communication using coroutines against the VehicleDataBroker.
  * The current implementation uses the 'kuksa.val.v2' protocol which can be found here:
  * https://github.com/eclipse-kuksa/kuksa-databroker/tree/main/proto/kuksa/val/v2.
  */
-class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
-    private val coroutineStub: VALGrpcKt.VALCoroutineStub
-        get() = VALGrpcKt.VALCoroutineStub(channel)
+@Suppress("TooManyFunctions")
+class CoroutineBrokerGrpcFacade(
+    host: String,
+    port: Int,
+    channelCredentials: ChannelCredentials = InsecureChannelCredentials.create(),
+) : GrpcClient {
+    private val channel: ManagedChannel = Grpc.newChannelBuilderForAddress(
+        host,
+        port,
+        channelCredentials,
+    ).build()
+
+    private val coroutineStub: VALGrpcKt.VALCoroutineStub = VALGrpcKt.VALCoroutineStub(channel)
+
+    init {
+        Logger.info(TAG, "Connecting to gRPC service at $host:$port")
+        channel.getState(true)
+    }
 
     /**
      * Gets the latest value of a [signalId].
@@ -82,33 +103,36 @@ class BrokerGrpcFacade(private val channel: Channel) : GrpcClient {
     }
 
     /**
-     * Lists the values of [signalIds] matching the request and responds with a list of signal values. Only values of
-     * signals that the user is allowed to read are included (everything else is ignored).
-     *
-     * The server might respond with the following GRPC error codes:
-     *    NOT_FOUND if any of the requested signals doesn't exist.
-     *    PERMISSION_DENIED if access is denied for any of the requested signals.
-     */
-    suspend fun listValues(signalIds: List<SignalID>): ListValuesResponse {
-        val request = listValuesRequest {
-            this.signalIds.addAll(signalIds)
-        }
-
-        return coroutineStub.listValues(request)
-    }
-
-    /**
-     * Subscribes to a set of [signalIds].
-     *
-     * The server might respond with the following GRPC error codes:
+     * Subscribe to a set of signals using i32 id parameters
+     * Returns (GRPC error code):
      *    NOT_FOUND if any of the signals are non-existent.
      *    PERMISSION_DENIED if access is denied for any of the signals.
      */
+    fun subscribeById(
+        signalIds: List<Int>,
+    ): Flow<KuksaValV2.SubscribeByIdResponse> {
+        val request = subscribeByIdRequest {
+            this.signalIds.addAll(signalIds)
+        }
+
+        return coroutineStub.subscribeById(request)
+    }
+
+    /**
+     * Subscribe to a set of signals using string path parameters
+     * Returns (GRPC error code):
+     *    NOT_FOUND if any of the signals are non-existent.
+     *    PERMISSION_DENIED if access is denied for any of the signals.
+     *
+     * When subscribing the Broker shall immediately return the value for all
+     * subscribed entries. If no value is available when subscribing a DataPoint
+     * with value None shall be returned.
+     */
     fun subscribe(
-        signalIds: List<SignalID>,
+        signalPaths: List<String>,
     ): Flow<SubscribeResponse> {
         val request = subscribeRequest {
-            this.signalIds.addAll(signalIds)
+            this.signalPaths.addAll(signalPaths)
         }
 
         return coroutineStub.subscribe(request)
