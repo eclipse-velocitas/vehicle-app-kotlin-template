@@ -16,35 +16,20 @@
 
 package com.example.app
 
-import androidx.car.app.CarAppService
-import androidx.car.app.Session
-import androidx.car.app.validation.HostValidator
+import com.example.logger.LogcatLoggingStrategy
+import org.eclipse.velocitas.sdk.VehicleApplication
+import org.eclipse.velocitas.sdk.logging.Logger
 
-/**
- * The base class for implementing a car app that runs in the car
- *
- * @see CarAppService
- */
-class VehicleAppService : CarAppService() {
-    private val vehicleApp = VehicleApp()
-
-    override fun createHostValidator(): HostValidator {
-        return HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
+class VehicleApp : VehicleApplication() {
+    init {
+        Logger.loggingStrategy = LogcatLoggingStrategy
     }
 
-    override fun onCreateSession(): Session {
-        return VehicleAppSession()
+    override fun onStart() {
+        // unused
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        vehicleApp.start()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        vehicleApp.stop()
+    override fun onStop() {
+        // unused
     }
 }

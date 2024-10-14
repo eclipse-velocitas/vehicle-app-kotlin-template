@@ -24,7 +24,7 @@ private const val TAG = "VehicleApplication"
 /**
  * Base class for all vehicle apps which manages an app's lifecycle.
  */
-abstract class VehicleApp {
+abstract class VehicleApplication {
     private val middlewareFactory = MiddlewareFactory()
     private val middleware = middlewareFactory.create()
 
