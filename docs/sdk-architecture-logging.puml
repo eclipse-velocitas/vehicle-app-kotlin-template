@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+package sdk {
+    package logging {
+        class Logger {
+            + loggingStrategy: LoggingStrategy
+            + verbose(tag: String, message: String, vararg messageArgs: Any?)
+            + debug(tag: String, message: String, vararg messageArgs: Any?)
+            + info(tag: String, message: String, vararg messageArgs: Any?)
+            + warn(tag: String, message: String, throwable: Throwable, vararg messageArgs: Any?)
+            + warn(tag: String, message: String, vararg messageArgs: Any?)
+            + warn(tag: String, message: String, throwable: Throwable, vararg messageArgs: Any?)
+            + error(tag: String, message: String, vararg messageArgs: Any?)
+        }
+        interface LoggingStrategy {
+            + verbose(tag: String, message: String)
+            + debug(tag: String, message: String)
+            + info(tag: String, message: String)
+            + warn(tag: String, message: String)
+            + error(tag: String, message: String)
+        }
+        class ConsoleLoggingStrategy {
+            + INSTANCE: ConsoleLoggingStrategy
+        }
+
+        LoggingStrategy -up-* Logger
+        ConsoleLoggingStrategy -up-|> LoggingStrategy
+    }
+}
+
+@enduml

@@ -1,0 +1,44 @@
+cx @startuml
+'https://plantuml.com/class-diagram
+
+
+package sdk {
+    package grpc {
+        interface GrpcClient
+        class AsyncBrokerGrpcFacade
+        class CoroutineBrokerGrpcFacade
+
+        AsyncBrokerGrpcFacade -up-|> GrpcClient
+        CoroutineBrokerGrpcFacade -up-|> GrpcClient
+    }
+
+    package logging {
+        class Logger
+        interface LoggingStrategy
+        class ConsoleLoggingStrategy
+
+        LoggingStrategy --* Logger
+        ConsoleLoggingStrategy -|> LoggingStrategy
+    }
+
+    package middleware {
+        abstract class Middleware
+        class NativeMiddleware
+        class MiddlewareFactory
+        class Metadata
+
+        MiddlewareFactory -right-> Middleware: <<instantiates>>
+        NativeMiddleware -down-|> Middleware
+        Middleware *- Metadata
+    }
+
+    abstract class VehicleApplication
+
+    Middleware -down-* VehicleApplication
+    VehicleApplication --> MiddlewareFactory
+}
+
+@enduml
+
+
+

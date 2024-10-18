@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+package sdk {
+    package generated {
+        class SignalId
+        class GetValuesRequest
+        class getValuesResponse
+    }
+    package proto-kuksa-val-v2 {
+    }
+    package grpc {
+        interface GrpcClient
+        class CoroutineBrokerGrpcFacade {
+            + getValue(SignalId): GetValueResponse
+            + getValues(List<SignalId>): GetValuesResponse
+            + listValues(List<SignalId>): ListValuesResponse
+            + subscribe(List<String>): Flow<SubscribeResponse>
+            + subscribeById(List<Int>): Flow<SubscribeByIdResponse>
+            + actuate(List<SignalId>): ActuateResponse
+            + batchActuate(List<SignalId>): BatchActuateResponse
+            + listMetadata(List<SignalId>): ListMetadataResponse
+            + publishValue(List<SignalId>): PublishValueResponse
+            + openProviderStream(Flow<OpenProviderStreamRequest>): Flow<OpenProviderStreamResponse>
+            + getServerInfo(): GetServerInfoResponse
+        }
+
+        class AsyncBrokerGrpcFacade {
+            + getValue(SignalId): ListenableFuture<GetValueResponse>
+            + getValues(List<SignalId>): ListenableFuture<GetValuesResponse>
+            + listValues(List<SignalId>): ListenableFuture<ListValuesResponse>
+            + subscribe(List<String>, StreamObserver<SubscribeResponse>)
+            + subscribeById(List<Int>, StreamObserver<SubscribeByIdResponse>)
+            + actuate(List<SignalId>): ListenableFuture<ActuateResponse>
+            + batchActuate(List<SignalId>): ListenableFuture<BatchActuateResponse>
+            + listMetadata(List<SignalId>): ListenableFuture<ListMetadataResponse>
+            + publishValue(List<SignalId>): ListenableFuture<PublishValueResponse>
+            + openProviderStream(StreamObserver<OpenProviderStreamResponse>): StreamObserver<OpenProviderStreamRequest>
+            + getServerInfo(): ListenableFuture<GetServerInfoResponse>
+        }
+    }
+    "proto-kuksa-val-v2" -> generated: generates
+    CoroutineBrokerGrpcFacade -up-|> GrpcClient
+    AsyncBrokerGrpcFacade -up-|> GrpcClient
+    CoroutineBrokerGrpcFacade --> generated
+    AsyncBrokerGrpcFacade --> generated
+}
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+package sdk {
+    package middleware {
+        abstract class Middleware {
+            + start()
+            + stop()
+            + waitUntilReady()
+            + findServiceLocation(serviceName: String)
+            + getMetadata(serviceName: String)
+        }
+        class NativeMiddleware
+        class MiddlewareFactory {
+            + create(): Middleware
+        }
+        class Metadata
+
+        MiddlewareFactory -right-> Middleware: <<instantiates>>
+        NativeMiddleware -down-|> Middleware
+        Middleware *- Metadata
+    }
+
+    abstract class VehicleApplication {
+        + start()
+        + stop()
+        + onStart()
+        + onStop()
+    }
+
+    Middleware -up-* VehicleApplication
+    VehicleApplication -up-> MiddlewareFactory
+}
+
+@enduml
