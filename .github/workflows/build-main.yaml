@@ -1,8 +1,9 @@
-name: Validate Pull Request
+name: Build Main
 
 on:
-  - pull_request
-
+  push:
+    branches:
+      - main
 
 jobs:
   build-project:
@@ -40,7 +41,6 @@ jobs:
           name: test
           path: ${{ github.workspace }}/**/build/reports/tests/test
           if-no-files-found: error
-
 
       - name: Upload Velocitas SDK
         if: always()
