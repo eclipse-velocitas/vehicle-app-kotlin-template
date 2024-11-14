@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+message UnlockDoorRequest {
+}
+
+message UnlockDoorResponse {
+  optional bool success = 1;
+}
+
+message LockDoorRequest {
+}
+
+message LockDoorResponse {
+  optional bool success = 1;
+}
+
+service DoorService {
+  rpc UnlockDoor(UnlockDoorRequest) returns (UnlockDoorResponse);
+  rpc LockDoor(LockDoorRequest) returns (LockDoorResponse);
+}

@@ -16,10 +16,9 @@
 
 package com.example.service
 
+import DoorServiceGrpc
+import DoorServiceOuterClass
 import android.util.Log
-import door.DoorGrpc
-import door.DoorGrpc.DoorFutureStub
-import door.DoorService
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
 
@@ -30,7 +29,7 @@ class GrpcCarService(
     port: Int,
 ) : CarService {
 
-    private val doorService: DoorFutureStub
+    private val doorService: DoorServiceGrpc.DoorServiceFutureStub
 
     init {
         Log.i(TAG, "Connecting to gRPC service at $host:$port")
@@ -38,21 +37,21 @@ class GrpcCarService(
         val channelCredentials = InsecureChannelCredentials.create()
         val channel = Grpc.newChannelBuilderForAddress(host, port, channelCredentials).build()
 
-        doorService = DoorGrpc.newFutureStub(channel)
+        doorService = DoorServiceGrpc.newFutureStub(channel)
     }
 
     // Door service
     override fun lockDoor(): Boolean {
-        val request = DoorService.LockRequest.newBuilder().build()
-        val response = doorService.lock(request).get() // blocking call
-        Log.i(TAG, "lockDoor: Got response: " + response.getCode())
-        return response.getCode() == DoorService.BCMReturnCode.BCM_RETURN_CODE_SUCCESS
+        val request = DoorServiceOuterClass.LockDoorRequest.newBuilder().build()
+        val response = doorService.lockDoor(request).get() // blocking call
+        Log.i(TAG, "lockDoor: Got response: " + response.success)
+        return response.success
     }
 
     override fun unlockDoor(): Boolean {
-        val request = DoorService.UnlockRequest.newBuilder().build()
-        val response = doorService.unlock(request).get() // blocking call
-        Log.i(TAG, "unlockDoor: Got response: " + response.getCode())
-        return response.getCode() == DoorService.BCMReturnCode.BCM_RETURN_CODE_SUCCESS
+        val request = DoorServiceOuterClass.UnlockDoorRequest.newBuilder().build()
+        val response = doorService.unlockDoor(request).get() // blocking call
+        Log.i(TAG, "unlockDoor: Got response: " + response.success)
+        return response.success
     }
 }

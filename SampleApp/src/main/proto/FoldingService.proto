@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+message FoldMirrorsRequest {
+}
+
+message FoldMirrorsResponse {
+  optional bool success = 1;
+}
+
+message UnfoldMirrorsRequest {
+}
+
+message UnfoldMirrorsResponse {
+  optional bool success = 1;
+}
+
+message GetMirrorFoldStatusRequest {
+}
+
+message GetMirrorFoldStatusResponse {
+  optional uint32 status = 1;
+}
+
+message SetMirrorFoldStatusRequest {
+  optional uint32 mirrorFoldStatus = 1;
+}
+
+message SetMirrorFoldStatusResponse {
+  optional bool success = 1;
+}
+
+service FoldingService {
+  rpc FoldMirrors(FoldMirrorsRequest) returns (FoldMirrorsResponse);
+  rpc UnfoldMirrors(UnfoldMirrorsRequest) returns (UnfoldMirrorsResponse);
+  rpc GetMirrorFoldStatus(GetMirrorFoldStatusRequest) returns (GetMirrorFoldStatusResponse);
+  rpc SetMirrorFoldStatus(SetMirrorFoldStatusRequest) returns (SetMirrorFoldStatusResponse);
+}

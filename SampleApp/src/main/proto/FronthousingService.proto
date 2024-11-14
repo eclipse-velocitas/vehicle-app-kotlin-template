@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+message EnableAirConditioningRequest {
+}
+
+message EnableAirConditioningResponse {
+  optional bool success = 1;
+}
+
+message DisableAirConditioningRequest {
+}
+
+message DisableAirConditioningResponse {
+  optional bool success = 1;
+}
+
+message GetAirConditioningStatusRequest {
+}
+
+message GetAirConditioningStatusResponse {
+  optional uint32 status = 1;
+}
+
+message SetAirConditioningStatusRequest {
+  optional uint32 airConditioningStatus = 1;
+}
+
+message SetAirConditioningStatusResponse {
+  optional bool success = 1;
+}
+
+service FronthousingService {
+  rpc EnableAirConditioning(EnableAirConditioningRequest) returns (EnableAirConditioningResponse);
+  rpc DisableAirConditioning(DisableAirConditioningRequest) returns (DisableAirConditioningResponse);
+  rpc GetAirConditioningStatus(GetAirConditioningStatusRequest) returns (GetAirConditioningStatusResponse);
+  rpc SetAirConditioningStatus(SetAirConditioningStatusRequest) returns (SetAirConditioningStatusResponse);
+}
