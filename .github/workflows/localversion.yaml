@@ -1,0 +1,47 @@
+name: Release local version
+concurrency:
+  group: local-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    # Run only on branches/commits and not tags
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  create-local-version:
+    name: Create local version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Initialize Caches
+        run: ./gradlew clean build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vehicle-app-kotlin-template
+          include-hidden-files: true
+          path: |
+            ./**
+            !build
+            !.idea
+            !.github
+            !.git
+            !.gitignore

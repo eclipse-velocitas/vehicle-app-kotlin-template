@@ -37,6 +37,7 @@ val ktlintCheck by tasks.registering(JavaExec::class) {
         "**/src/**/*.kt",
         "**.kts",
         "!**/build/**",
+        "!**/cache/**",
     )
 }
 
@@ -52,6 +53,7 @@ tasks.register<JavaExec>("ktlintFormat") {
         "**/src/**/*.kt",
         "**.kts",
         "!**/build/**",
+        "!**/cache/**",
     )
 }
 

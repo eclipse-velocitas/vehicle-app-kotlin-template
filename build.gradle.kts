@@ -63,7 +63,7 @@ tasks.withType<Detekt>().configureEach {
     parallel = true
     setSource(projectDir)
     include("**/*.kt", "**/*.kts")
-    exclude("**/resources/**", "**/build/**", "**/node_modules/**")
+    exclude("**/resources/**", "**/build/**", "**/node_modules/**", "**/cache/**")
 
     jvmTarget = "1.8"
 }
@@ -73,7 +73,7 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
 
     setSource(projectDir)
     include("**/*.kt", "**/*.kts")
-    exclude("**/resources/**", "**/build/**")
+    exclude("**/resources/**", "**/build/**", "**/node_modules/**", "**/cache/**")
 }
 
 tasks.withType<Detekt>().configureEach {
