@@ -16,9 +16,10 @@
 
 package com.example.app
 
+import kotlin.random.Random
 import kotlinx.coroutines.launch
-import android.widget.Toast
 import androidx.car.app.CarContext
+import androidx.car.app.CarToast
 import androidx.car.app.Screen
 import androidx.car.app.model.Action
 import androidx.car.app.model.CarIcon
@@ -67,9 +68,11 @@ class VehicleAppScreen(carContext: CarContext, private val vehicleApp: VehicleAp
                 vehicleApp.dataBrokerV2Service -> {
                     dataBrokerService = vehicleApp.dataBrokerV1Service
                 }
+
                 vehicleApp.dataBrokerV1Service -> {
                     dataBrokerService = vehicleApp.dataBrokerModelService
                 }
+
                 vehicleApp.dataBrokerModelService -> {
                     dataBrokerService = vehicleApp.dataBrokerV2Service
                 }
@@ -77,29 +80,39 @@ class VehicleAppScreen(carContext: CarContext, private val vehicleApp: VehicleAp
             invalidate()
         }
 
-
         val row1 = createRow(playIcon, "Fetch Speed") {
             lifecycleScope.launch {
                 Logger.info(TAG, "Requesting Vehicle.Speed")
-                val vehicleSpeed = dataBrokerService.fetchSpeed()
-                Logger.info(TAG, "Vehicle.Speed = $vehicleSpeed")
-                showToast(carContext, "Vehicle.Speed = $vehicleSpeed")
+                runCatching {
+                    dataBrokerService.fetchSpeed()
+                }.onSuccess { vehicleSpeed ->
+                    Logger.info(TAG, "Vehicle.Speed = $vehicleSpeed")
+                    showToast(carContext, "Vehicle.Speed = $vehicleSpeed")
+                }.onFailure { throwable ->
+                    Logger.warn(TAG, "An error occurred: ", throwable)
+                }
             }
         }
 
         val row2 = createRow(playIcon, "Update Vehicle.Speed") {
             lifecycleScope.launch {
-                Logger.info(TAG, "Update Vehicle.Speed to 120")
-                dataBrokerService.updateSpeed(120.0F)
+                val random = Random(System.nanoTime())
+                val newSpeedValue = random.nextInt(120).toFloat()
+                Logger.info(TAG, "Update Vehicle.Speed to $newSpeedValue")
 
-                Logger.info(TAG, "Vehicle.Speed updated successfully")
-                showToast(carContext, "Vehicle.Speed updated successfully")
+                runCatching {
+                    dataBrokerService.updateSpeed(newSpeedValue)
+                }.onSuccess {
+                    Logger.info(TAG, "Vehicle.Speed updated successfully")
+                    showToast(carContext, "Vehicle.Speed updated successfully")
+                }.onFailure { throwable ->
+                    Logger.warn(TAG, "An error occurred: ", throwable)
+                }
             }
         }
 
         val row3 = createRow(playIcon, "Subscribe Vehicle.Speed") {
             lifecycleScope.launch {
-
                 dataBrokerService.subscribeSpeed(
                     onUpdate = { speedValue ->
                         Logger.info(TAG, "Subscription Update for Vehicle.Speed: $speedValue")
@@ -115,10 +128,15 @@ class VehicleAppScreen(carContext: CarContext, private val vehicleApp: VehicleAp
         val row4 = createRow(playIcon, "Lock Doors") {
             lifecycleScope.launch {
                 Logger.debug(TAG, "Requesting to lock the doors")
-                val success = vehicleApp.vehicleService.lockDoor()
-                if (success) {
-                    Logger.debug(TAG, "Doors locked successfully")
-                    showToast(carContext, "Doors locked successfully")
+                runCatching {
+                    vehicleApp.vehicleService.lockDoor()
+                }.onSuccess { success ->
+                    if (success) {
+                        Logger.debug(TAG, "Doors locked successfully")
+                        showToast(carContext, "Doors locked successfully")
+                    }
+                }.onFailure { throwable ->
+                    Logger.warn(TAG, "An error occurred: ", throwable)
                 }
             }
         }
@@ -126,10 +144,15 @@ class VehicleAppScreen(carContext: CarContext, private val vehicleApp: VehicleAp
         val row5 = createRow(playIcon, "Unlock Doors") {
             lifecycleScope.launch {
                 Logger.debug(TAG, "Requesting to unlock the doors")
-                val success = vehicleApp.vehicleService.unlockDoor()
-                if (success) {
-                    Logger.debug(TAG, "Doors unlocked successfully")
-                    showToast(carContext, "Doors unlocked successfully")
+                runCatching {
+                    vehicleApp.vehicleService.unlockDoor()
+                }.onSuccess { success ->
+                    if (success) {
+                        Logger.debug(TAG, "Doors unlocked successfully")
+                        showToast(carContext, "Doors unlocked successfully")
+                    }
+                }.onFailure { throwable ->
+                    Logger.warn(TAG, "An error occurred: ", throwable)
                 }
             }
         }
@@ -137,9 +160,14 @@ class VehicleAppScreen(carContext: CarContext, private val vehicleApp: VehicleAp
         val row6 = createRow(playIcon, "Get Lock Status") {
             lifecycleScope.launch {
                 Logger.debug(TAG, "Requesting Door Lock Status")
-                val doorLockStatus = vehicleApp.vehicleService.getLockStatus()
-                Logger.debug(TAG, "Door Lock Status: $doorLockStatus")
-                showToast(carContext, "Door Lock Status: $doorLockStatus")
+                runCatching {
+                    vehicleApp.vehicleService.fetchLockStatus()
+                }.onSuccess { status ->
+                    Logger.debug(TAG, "Door Lock Status: $status")
+                    showToast(carContext, "Door Lock Status: $status")
+                }.onFailure { throwable ->
+                    Logger.warn(TAG, "An error occurred: ", throwable)
+                }
             }
         }
 
@@ -164,10 +192,10 @@ class VehicleAppScreen(carContext: CarContext, private val vehicleApp: VehicleAp
     }
 
     private fun showToast(context: CarContext, message: String) {
-        Toast.makeText(
-            context.baseContext,
+        CarToast.makeText(
+            context,
             message,
-            Toast.LENGTH_SHORT
+            CarToast.LENGTH_SHORT
         ).show()
     }
 }
