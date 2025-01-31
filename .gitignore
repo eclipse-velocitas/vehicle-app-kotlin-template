@@ -31,6 +31,8 @@ stdout
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
+compiler.xml
+gradle.xml
 
 # Keystore files
 *.jks
@@ -41,3 +43,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Kotlin Profiling
+.kotlin
