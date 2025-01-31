@@ -25,8 +25,8 @@ import androidx.car.app.Session
  *
  * @see Session
  */
-class VehicleAppSession : Session() {
+class VehicleAppSession(private val vehicleApp: VehicleApp) : Session() {
     override fun onCreateScreen(intent: Intent): Screen {
-        return VehicleAppScreen(carContext)
+        return VehicleAppScreen(carContext, vehicleApp)
     }
 }

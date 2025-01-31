@@ -18,6 +18,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.vss.processor.plugin)
+}
+
+vssProcessor {
+    searchPath = "vss"
 }
 
 android {
@@ -30,8 +35,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -49,6 +52,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    packaging {
+        resources.pickFirsts.add("**")
     }
 }
 
@@ -90,7 +96,7 @@ protobuf {
 }
 
 dependencies {
-    implementation(project(":sdk"))
+    implementation(libs.vehicle.app.java.sdk)
 
     implementation(libs.grpc.okhttp)
     implementation(libs.grpc.protobuf.lite)
@@ -100,11 +106,8 @@ dependencies {
     implementation(libs.protobuf.kotlin.lite)
 
     implementation(libs.androidx.fragment.ktx)
-
     implementation(libs.androidx.car.app)
     implementation(libs.androidx.car.app.automotive)
-    testImplementation(libs.androidx.car.app.testing)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.kotlinx.coroutines.android)
 }

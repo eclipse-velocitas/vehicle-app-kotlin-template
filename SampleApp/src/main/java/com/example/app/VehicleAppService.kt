@@ -26,6 +26,7 @@ import androidx.car.app.validation.HostValidator
  * @see CarAppService
  */
 class VehicleAppService : CarAppService() {
+
     private val vehicleApp = VehicleApp()
 
     override fun createHostValidator(): HostValidator {
@@ -33,7 +34,7 @@ class VehicleAppService : CarAppService() {
     }
 
     override fun onCreateSession(): Session {
-        return VehicleAppSession()
+        return VehicleAppSession(vehicleApp)
     }
 
     override fun onCreate() {

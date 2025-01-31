@@ -16,7 +16,13 @@
 
 package com.example.service
 
-interface CarService {
-    fun lockDoor(): Boolean
-    fun unlockDoor(): Boolean
+interface DataBrokerService {
+    suspend fun connect()
+    fun disconnect()
+    suspend fun fetchSpeed(): Float
+    suspend fun updateSpeed(speed: Float): Boolean
+    suspend fun subscribeSpeed(
+        onUpdate: (Float) -> Unit,
+        onError: (Throwable) -> Unit,
+    )
 }

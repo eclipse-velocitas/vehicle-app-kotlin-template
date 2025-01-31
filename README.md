@@ -7,8 +7,7 @@ This project is in incubation status. Not all required functionality might be mi
 ## Overview
 
 This Velocitas template has a native Android Gradle project setup. It does not use Visual Studio Code Dev Containers
-like
-the other template repositories. Every dependency needed is provided by the Gradle build system.
+like the other template repositories. Every dependency needed is provided by the Gradle build system.
 
 ## Quickstart
 

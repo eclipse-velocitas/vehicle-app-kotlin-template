@@ -1,20 +1,45 @@
+/*
+ * Provides door control and status service, one atomic service for each door.
+ */
 syntax = "proto3";
-
-message UnlockDoorRequest {
-}
-
-message UnlockDoorResponse {
-  optional bool success = 1;
-}
-
-message LockDoorRequest {
-}
-
-message LockDoorResponse {
-  optional bool success = 1;
-}
+package com.etas.e2e.tools.byd;
 
 service DoorService {
+  /* The door is unlocked. */
   rpc UnlockDoor(UnlockDoorRequest) returns (UnlockDoorResponse);
+
+  /* Door lock.  */
   rpc LockDoor(LockDoorRequest) returns (LockDoorResponse);
+
+  /* Open door */
+  rpc OpenDoor(OpenDoorRequest) returns (OpenDoorResponse);
+
+  /* Get the current status of the Door lock */
+  rpc GetLockStatus(GetLockStatusRequest) returns (GetLockStatusResponse);
+}
+
+message GetLockStatusRequest {}
+
+message GetLockStatusResponse {
+  uint32 status = 1;
+}
+
+message UnlockDoorRequest {}
+
+message UnlockDoorResponse {
+  bool success = 1;
+}
+
+message LockDoorRequest {}
+
+message LockDoorResponse {
+  bool success = 1;
+}
+
+message OpenDoorRequest {
+  float Speed = 1;
+}
+
+message OpenDoorResponse {
+  int64 duration = 1;
 }
