@@ -16,11 +16,39 @@
 
 package com.example.service
 
+/**
+ * DataBroker abstraction layer providing and demonstrating how to use the different protocols.
+ *
+ * Currently supported protocols:
+ * - kuksa.val.v1 (incl. VSS Models; see: DataBrokerModelService)
+ * - kuksa.val.v2
+ */
 interface DataBrokerService {
+    /**
+     * Connects to the DataBrokerService. Once connected it is possible to execute the corresponding Service Operations
+     */
     suspend fun connect()
+
+    /**
+     * Disconnects from the DataBrokerService. Once disconnected it is no longer possible to execute the corresponding
+     * Service Operations.
+     */
     fun disconnect()
+
+    /**
+     * Fetches the Vehicle.Speed.
+     */
     suspend fun fetchSpeed(): Float
+
+    /**
+     * Updates the Vehicle.Speed to the specified [speed].
+     */
     suspend fun updateSpeed(speed: Float): Boolean
+
+    /**
+     * Subscribes to the Vehicle.Speed. Speed updates will be delivered using the [onUpdate] callback, while any error
+     * occurring will be delivered using the [onError] callback.
+     */
     suspend fun subscribeSpeed(
         onUpdate: (Float) -> Unit,
         onError: (Throwable) -> Unit,

@@ -31,6 +31,9 @@ import org.eclipse.kuksa.proto.v1.datapoint
 
 private const val VSS_VEHICLE_SPEED = "Vehicle.Speed"
 
+/**
+ * DataBrokerService which uses the kuksa.val.v1 protocol.
+ */
 class DataBrokerV1Service(
     private val host: String,
     private val port: Int,

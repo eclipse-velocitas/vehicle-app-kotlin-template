@@ -29,6 +29,9 @@ import io.grpc.ManagedChannel
 
 private const val TAG = "SampleServiceImpl"
 
+/**
+ * A example implementation of a VehicleService providing Vehicle Functionality. See proto/DoorService.proto
+ */
 class VehicleService(
     private val host: String,
     private val port: Int,
@@ -37,6 +40,9 @@ class VehicleService(
     private var managedChannel: ManagedChannel? = null
     private lateinit var doorService: DoorServiceGrpcKt.DoorServiceCoroutineStub
 
+    /**
+     * Connects to the VehicleService. Once connected it is possible to execute the corresponding Service Operations
+     */
     fun connect() {
         managedChannel = Grpc.newChannelBuilderForAddress(host, port, channelCredentials)
             .build()
@@ -45,11 +51,20 @@ class VehicleService(
             }
     }
 
+    /**
+     * Disconnects from the VehicleService. Once disconnected it is no longer possible to execute the corresponding
+     * Service Operations.
+     */
     fun disconnect() {
         managedChannel?.shutdown()
         managedChannel = null
     }
 
+    /**
+     * Locks the vehicle doors.
+     *
+     * @throws IllegalStateException when the DoorService is not connected. Call #connect first!
+     */
     suspend fun lockDoor(): Boolean {
         check(::doorService.isInitialized) { "Not connected to DoorService. Call #connect first." }
 
@@ -59,6 +74,11 @@ class VehicleService(
         return response.success
     }
 
+    /**
+     * Unlocks the vehicle doors.
+     *
+     * @throws IllegalStateException when the DoorService is not connected. Call #connect first!
+     */
     suspend fun unlockDoor(): Boolean {
         check(::doorService.isInitialized) { "Not connected to DoorService. Call #connect first." }
 
@@ -68,6 +88,11 @@ class VehicleService(
         return response.success
     }
 
+    /**
+     * Opens the vehicle doors.
+     *
+     * @throws IllegalStateException when the DoorService is not connected. Call #connect first!
+     */
     suspend fun openDoor(): Long {
         check(::doorService.isInitialized) { "Not connected to DoorService. Call #connect first." }
 
@@ -76,7 +101,12 @@ class VehicleService(
         return response.duration
     }
 
-    suspend fun getLockStatus(): Int {
+    /**
+     * Retrieves the lock status of the vehicle doors.
+     *
+     * @throws IllegalStateException when the DoorService is not connected. Call #connect first!
+     */
+    suspend fun fetchLockStatus(): Int {
         check(::doorService.isInitialized) { "Not connected to DoorService. Call #connect first." }
 
         val request = getLockStatusRequest { }

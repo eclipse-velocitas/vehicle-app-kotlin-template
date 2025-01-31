@@ -28,6 +28,9 @@ import org.eclipse.kuksa.connectivity.databroker.v1.request.VssNodeSubscribeRequ
 import org.eclipse.kuksa.connectivity.databroker.v1.request.VssNodeUpdateRequest
 import org.eclipse.velocitas.vss.VssVehicle
 
+/**
+ * DataBrokerService which uses the kuksa.val.v1 protocol with generated VSS Models.
+ */
 class DataBrokerModelService(
     private val host: String,
     private val port: Int,
