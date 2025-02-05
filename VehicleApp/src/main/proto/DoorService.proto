@@ -2,7 +2,7 @@
  * Provides door control and status service, one atomic service for each door.
  */
 syntax = "proto3";
-package com.etas.e2e.tools.byd;
+package com.example.door;
 
 service DoorService {
   /* The door is unlocked. */

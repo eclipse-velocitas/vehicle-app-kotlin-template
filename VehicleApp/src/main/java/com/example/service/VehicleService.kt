@@ -16,18 +16,17 @@
 
 package com.example.service
 
-import android.util.Log
-import com.etas.e2e.tools.byd.DoorServiceGrpcKt
-import com.etas.e2e.tools.byd.getLockStatusRequest
-import com.etas.e2e.tools.byd.lockDoorRequest
-import com.etas.e2e.tools.byd.openDoorRequest
-import com.etas.e2e.tools.byd.unlockDoorRequest
+import com.example.door.DoorServiceGrpcKt
+import com.example.door.getLockStatusRequest
+import com.example.door.lockDoorRequest
+import com.example.door.openDoorRequest
+import com.example.door.unlockDoorRequest
 import io.grpc.ChannelCredentials
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
 import io.grpc.ManagedChannel
 
-private const val TAG = "SampleServiceImpl"
+private const val TAG = "VehicleService"
 
 /**
  * A example implementation of a VehicleService providing Vehicle Functionality. See proto/DoorService.proto
@@ -70,7 +69,6 @@ class VehicleService(
 
         val request = lockDoorRequest { }
         val response = doorService.lockDoor(request)
-        Log.i(TAG, "lockDoor: Got response: " + response.success)
         return response.success
     }
 
@@ -84,7 +82,6 @@ class VehicleService(
 
         val request = unlockDoorRequest { }
         val response = doorService.unlockDoor(request)
-        Log.i(TAG, "unlockDoor: Got response: " + response.success)
         return response.success
     }
 
